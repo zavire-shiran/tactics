@@ -8,16 +8,21 @@ def init(size):
 	width, height = size
 	surface = display.set_mode(size, OPENGL | DOUBLEBUF)
 
+        glEnable(GL_BLEND)
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
 	glMatrixMode(GL_PROJECTION)
 	glLoadIdentity()
-	glOrtho(0, 1, 0, 1, 1, -1)
+	glOrtho(0, float(width)/float(height), 1, 0, 1, -1)
 	glMatrixMode(GL_MODELVIEW)
 	glPushMatrix()
 	glLoadIdentity()
 
-	glClearColor(0.1, 0.1, 0.1, 1.0)
+	glClearColor(0.9, 0.3, 0.3, 1.0)
 	glEnable(GL_DEPTH_TEST)
 	glDisable(GL_CULL_FACE)
+
+	return float(width)/height
 	
 def startframe():
 	glLoadIdentity()
@@ -25,4 +30,3 @@ def startframe():
 
 def endframe():
 	display.flip()
-
