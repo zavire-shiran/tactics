@@ -3,7 +3,6 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import math
 
-
 def init(size):
 	width, height = size
 	surface = display.set_mode(size, OPENGL | DOUBLEBUF)
@@ -13,7 +12,7 @@ def init(size):
 
 	glMatrixMode(GL_PROJECTION)
 	glLoadIdentity()
-	glOrtho(0, float(width)/float(height), 1, 0, 1, -1)
+	glOrtho(0, float(width)/float(height), 1, 0, -10, 10)
 	glMatrixMode(GL_MODELVIEW)
 	glPushMatrix()
 	glLoadIdentity()
