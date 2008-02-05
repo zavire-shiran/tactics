@@ -2,13 +2,15 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import text
 import math
+from array import array
 
 class board:
     def __init__ (self, texture):
         self.texture = texture
         self.pos = [0, 0]
         self.selected = None
-        self.size = (30,30)
+        self.board = array(30, 30)
+        self.size = self.board.size
         self.screensize = 10.0
     def move (self, delta):
         self.pos[0] += delta[0]
