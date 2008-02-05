@@ -20,7 +20,7 @@ size = 800, 600
 
 screen.init(size)
 
-b = board.board(texture.Texture("Grass.png"))
+b = board.board()
 
 t = texture.Text("Hello", pygame.font.Font("Arial.ttf", 18))
 
