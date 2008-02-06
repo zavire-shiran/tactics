@@ -1,14 +1,45 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
-import text
 import math
+from array import array
+import texture
+import pprint
 
-class board:
+class tile:
     def __init__ (self, texture):
         self.texture = texture
+        self.contents = None
+        self.passable = True
+    def draw(self, pos, size):
+        self.texture()
+        x, y = pos
+        glBegin(GL_QUADS)
+        glColor4f(1.0, 1.0, 1.0, 1.0)
+        glTexCoord2f(0.0, 0.0)
+        glVertex2f(x, y)
+        glTexCoord2f(0.0, 1.0)
+        glVertex2f(x, y+size)
+        glTexCoord2f(1.0, 1.0)
+        glVertex2f(x+size, y+size)
+        glTexCoord2f(1.0, 0.0)
+        glVertex2f(x+size, y)
+        glEnd()
+
+class board:
+    def __init__ (self):
         self.pos = [0, 0]
         self.selected = None
-        self.size = (30,30)
+        self.selectedtexture = texture.Texture("Border.png")
+        self.board = array(30, 30)
+        self.size = self.board.size
+        grass = texture.Texture("Grass.png")
+        ocean = texture.Texture("Ocean.png")
+        for x in xrange(self.size[0]):
+            for y in xrange (self.size[1]):
+                if (x+y) % 2 == 0:
+                    self.board[x, y] = tile(grass)
+                else:
+                    self.board[x, y] = tile(ocean)
         self.screensize = 10.0
     def move (self, delta):
         self.pos[0] += delta[0]
@@ -19,23 +50,26 @@ class board:
         tilesize = 1.0/self.screensize
         glPushMatrix()
         glTranslatef(-self.pos[0], -self.pos[1], 0.0)
-        text.render("Hello")
-        for i in [x/self.screensize for x in xrange(int(self.size[0]))]:
-            for j in [x/self.screensize for x in xrange(int(self.size[1]))]:
-                self.texture()
-                glBegin(GL_QUADS)
-                glColor4f(1.0, 1.0, 1.0, 1.0)
-                glTexCoord2f(0.0, 0.0)
-                glVertex2f(i, j)
-                glTexCoord2f(0.0, 1.0)
-                glVertex2f(i, j+tilesize)
-                glTexCoord2f(1.0, 1.0)
-                glVertex2f(i+tilesize, j+tilesize)
-                glTexCoord2f(1.0, 0.0)
-                glVertex2f(i+tilesize, j)
-                glEnd()
+        for x, i in zip(range(self.size[0]), [z/self.screensize for z in xrange(self.size[0])]):
+            for y, j in zip(range(self.size[1]), [z/self.screensize for z in xrange(self.size[1])]):
+                self.board[x, y].draw((i, j), tilesize)
         glTranslate(0.0, 0.0, 0.1)
-        glDisable(GL_TEXTURE_2D)
+        if self.selected:
+            x = self.selected[0]/self.screensize
+            y = self.selected[1]/self.screensize
+            self.selectedtexture()
+            glBegin(GL_QUADS)
+            glColor4f(1.0, 1.0, 1.0, 1.0)
+            glTexCoord2f(0.0, 0.0)
+            glVertex2f(x, y)
+            glTexCoord2f(0.0, 1.0)
+            glVertex2f(x, y+tilesize)
+            glTexCoord2f(1.0, 1.0)
+            glVertex2f(x+tilesize, y+tilesize)
+            glTexCoord2f(1.0, 0.0)
+            glVertex2f(x+tilesize, y)
+            glEnd()            
+            glDisable(GL_TEXTURE_2D)
         glBegin(GL_LINES)
         glColor4f(0.0, 0.0, 0.0, 1.0)
         for i in [x/self.screensize for x in xrange(int(self.size[0]))]:
