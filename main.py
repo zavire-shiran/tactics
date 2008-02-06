@@ -2,7 +2,6 @@
 from pygame import display, OPENGL, DOUBLEBUF
 from OpenGL.GL import *
 from OpenGL.GLU import *
-import Image
 
 import pygame
 import screen
