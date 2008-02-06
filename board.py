@@ -9,6 +9,7 @@ class tile:
     def __init__ (self, texture):
         self.texture = texture
         self.contents = None
+        self.passable = True
     def draw(self, pos, size):
         self.texture()
         x, y = pos
