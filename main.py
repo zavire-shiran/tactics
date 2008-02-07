@@ -15,7 +15,7 @@ pygame.init()
 
 frametime = .05
 
-size = 800, 600
+size = 640, 480
 
 screen.init(size)
 
@@ -43,8 +43,8 @@ try:
 		glBegin(GL_QUADS)
 		glColor4f(0.1, 0.1, 0.3, 1.0)
 		glVertex3f(1, 0, 5)
-		glVertex3f(4.0/3.0, 0, 5)
-		glVertex3f(4.0/3.0, 1, 5)
+		glVertex3f(size[0]/float(size[1]), 0, 5)
+		glVertex3f(size[0]/float(size[1]), 1, 5)
 		glVertex3f(1, 1, 5)
 		glEnd()
 		glPushMatrix()
