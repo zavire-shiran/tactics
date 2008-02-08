@@ -5,12 +5,18 @@ from array import array
 import texture
 import pprint
 
+class character:
+    def __init__ (self, texture):
+        self.texture = texture
+    def __call__ (self):
+        self.texture()
+
 class tile:
     def __init__ (self, texture):
         self.texture = texture
         self.contents = None
         self.passable = True
-    def draw(self, pos, size):
+    def draw (self, pos, size):
         self.texture()
         x, y = pos
         glBegin(GL_QUADS)
@@ -95,8 +101,7 @@ class board:
             glVertex2f(self.size[0]/self.screensize, i)
         glEnd()
         glPopMatrix()
-    def select(self, pos):
+    def select (self, pos):
         self.selected = (int(math.floor(self.screensize * (pos[0] + self.pos[0]))),
                          int(math.floor(self.screensize * (pos[1] + self.pos[1]))))
-        self.board.reference(self.selected).contents = self.enemy
-
+        self.board.reference(self.selected).contents = character(self.enemy)
