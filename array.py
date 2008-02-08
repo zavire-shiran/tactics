@@ -17,6 +17,9 @@ class array:
 		for i in range(1, len(key)):
 			index += key[i] * reduce(operator.mul, self.size[:i])
 		return index
+
+	def reference(self, key):
+		return self.__getitem__(key)
 	
 	def __getitem__(self, key):
 		index = self.ndim2flat(key)

@@ -5,12 +5,18 @@ from array import array
 import texture
 import pprint
 
+class character:
+    def __init__ (self, texture):
+        self.texture = texture
+    def __call__ (self):
+        self.texture()
+
 class tile:
     def __init__ (self, texture):
         self.texture = texture
         self.contents = None
         self.passable = True
-    def draw(self, pos, size):
+    def draw (self, pos, size):
         self.texture()
         x, y = pos
         glBegin(GL_QUADS)
@@ -24,6 +30,20 @@ class tile:
         glTexCoord2f(1.0, 0.0)
         glVertex2f(x+size, y)
         glEnd()
+        if self.contents:
+            self.contents()
+            glBegin(GL_QUADS)
+            glColor4f(1.0, 1.0, 1.0, 1.0)
+            glTexCoord2f(0.0, 0.0)
+            glVertex3f(x, y, 1.0)
+            glTexCoord2f(0.0, 1.0)
+            glVertex3f(x, y+size, 1.0)
+            glTexCoord2f(1.0, 1.0)
+            glVertex3f(x+size, y+size, 1.0)
+            glTexCoord2f(1.0, 0.0)
+            glVertex3f(x+size, y, 1.0)
+            glEnd()
+
 
 class board:
     def __init__ (self):
@@ -32,6 +52,7 @@ class board:
         self.selectedtexture = texture.Texture("Border.png")
         self.board = array(30, 30)
         self.size = self.board.size
+        self.enemy = texture.Texture("Enemy.png")
         grass = texture.Texture("Grass.png")
         ocean = texture.Texture("Ocean.png")
         for x in xrange(self.size[0]):
@@ -61,13 +82,13 @@ class board:
             glBegin(GL_QUADS)
             glColor4f(1.0, 1.0, 1.0, 1.0)
             glTexCoord2f(0.0, 0.0)
-            glVertex2f(x, y)
+            glVertex3f(x, y, 4.0)
             glTexCoord2f(0.0, 1.0)
-            glVertex2f(x, y+tilesize)
+            glVertex3f(x, y+tilesize, 4.0)
             glTexCoord2f(1.0, 1.0)
-            glVertex2f(x+tilesize, y+tilesize)
+            glVertex3f(x+tilesize, y+tilesize, 4.0)
             glTexCoord2f(1.0, 0.0)
-            glVertex2f(x+tilesize, y)
+            glVertex3f(x+tilesize, y, 4.0)
             glEnd()            
             glDisable(GL_TEXTURE_2D)
         glBegin(GL_LINES)
@@ -80,7 +101,7 @@ class board:
             glVertex2f(self.size[0]/self.screensize, i)
         glEnd()
         glPopMatrix()
-    def select(self, pos):
+    def select (self, pos):
         self.selected = (int(math.floor(self.screensize * (pos[0] + self.pos[0]))),
                          int(math.floor(self.screensize * (pos[1] + self.pos[1]))))
-        print self.selected
+        self.board.reference(self.selected).contents = character(self.enemy)
