@@ -6,8 +6,11 @@ import texture
 import pprint
 
 class character:
-    def __init__ (self, texture):
+    def __init__ (self, texture, name):
         self.texture = texture
+        self.name = name
+    def __str__ (self):
+        return self.name
     def __call__ (self):
         self.texture()
 
@@ -52,16 +55,23 @@ class board:
         self.selectedtexture = texture.Texture("Border.png")
         self.board = array(30, 30)
         self.size = self.board.size
-        self.enemy = texture.Texture("Enemy.png")
         grass = texture.Texture("Grass.png")
         ocean = texture.Texture("Ocean.png")
         for x in xrange(self.size[0]):
             for y in xrange (self.size[1]):
-                if (x+y) % 2 == 0:
-                    self.board[x, y] = tile(grass)
-                else:
+                if x % 10 == 0 or y % 10 == 0:
                     self.board[x, y] = tile(ocean)
-        self.screensize = 10.0
+                else:
+                    self.board[x, y] = tile(grass)
+        self.screensize = 15.0
+
+        enemytexture = texture.Texture("Enemy.png")
+        herotexture = texture.Texture("Hero.png")
+        self.board[0,0].contents = character(herotexture, "Hero 1")
+        self.board[5,0].contents = character(herotexture, "Hero 2")
+        self.board[9,0].contents = character(herotexture, "Hero 3")
+        for x in xrange(self.size[0]):
+            self.board[x, 7].contents = character(enemytexture, "Enemy %i" % (x+1))
     def move (self, delta):
         self.pos[0] += delta[0]
         self.pos[0] = min(self.size[0]/self.screensize - 1, max(0, self.pos[0]))
@@ -94,14 +104,18 @@ class board:
         glBegin(GL_LINES)
         glColor4f(0.0, 0.0, 0.0, 1.0)
         for i in [x/self.screensize for x in xrange(int(self.size[0]))]:
-            glVertex2f(i, 0.0)
-            glVertex2f(i, self.size[1]/self.screensize)
+            glVertex3f(i, 0.0, 4.9)
+            glVertex3f(i, self.size[1]/self.screensize, 4.5)
         for i in [x/self.screensize for x in xrange(int(self.size[1]))]:
-            glVertex2f(0.0, i)
-            glVertex2f(self.size[0]/self.screensize, i)
+            glVertex3f(0.0, i, 4.9)
+            glVertex3f(self.size[0]/self.screensize, i, 4.5)
         glEnd()
         glPopMatrix()
     def select (self, pos):
         self.selected = (int(math.floor(self.screensize * (pos[0] + self.pos[0]))),
                          int(math.floor(self.screensize * (pos[1] + self.pos[1]))))
-        self.board.reference(self.selected).contents = character(self.enemy)
+    def getselected(self):
+        if self.selected:
+            return self.board.reference(self.selected)
+        else:
+            return None

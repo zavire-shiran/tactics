@@ -1,11 +1,14 @@
-from pygame import display, OPENGL, DOUBLEBUF, time
+from pygame import display, OPENGL, DOUBLEBUF, FULLSCREEN, time
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import math
 
-def init(size):
+def init(size, fullscreen = False):
 	width, height = size
-	surface = display.set_mode(size, OPENGL | DOUBLEBUF)
+	flags = OPENGL | DOUBLEBUF
+	if fullscreen:
+		flags = flags | FULLSCREEN
+	surface = display.set_mode(size, flags)
 
         glEnable(GL_BLEND)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
