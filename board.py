@@ -72,7 +72,7 @@ class board:
         self.board[9,0].contents = character(herotexture, "Hero 3")
         for x in xrange(self.size[0]):
             self.board[x, 7].contents = character(enemytexture, "Enemy %i" % (x+1))
-    def move (self, delta):
+    def movemap (self, delta):
         self.pos[0] += delta[0]
         self.pos[0] = min(self.size[0]/self.screensize - 1, max(0, self.pos[0]))
         self.pos[1] += delta[1]
@@ -111,9 +111,21 @@ class board:
             glVertex3f(self.size[0]/self.screensize, i, 4.5)
         glEnd()
         glPopMatrix()
+    def screentoworld(self, pos):
+        return (int(math.floor(self.screensize * (pos[0] + self.pos[0]))),
+                int(math.floor(self.screensize * (pos[1] + self.pos[1]))))
     def select (self, pos):
-        self.selected = (int(math.floor(self.screensize * (pos[0] + self.pos[0]))),
-                         int(math.floor(self.screensize * (pos[1] + self.pos[1]))))
+        newselection = self.screentoworld(pos)
+        if self.selected and \
+           self.getcontents(self.selected) and \
+           not self.getcontents(newselection):
+            self.setcontents(newselection, self.getcontents(self.selected))
+            self.setcontents(self.selected, None)
+        self.selected = newselection
+    def getcontents(self, pos):
+        return self.board.reference(pos).contents
+    def setcontents(self, pos, contents):
+        self.board.reference(pos).contents = contents
     def getselected(self):
         if self.selected:
             return self.board.reference(self.selected)

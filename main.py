@@ -23,6 +23,18 @@ screen.init(size, True)
 b = board.board()
 font = pygame.font.Font("Arial.ttf", 18)
 
+move = texture.Text("Moving", font)
+notmove = texture.Text("Not Moving", font)
+
+def move(board, frompos, topos):
+	newselection = self.screentoworld(pos)
+	if self.selected and \
+	   self.getcontents(self.selected) and \
+	   not self.getcontents(newselection):
+		self.setcontents(newselection, self.getcontents(self.selected))
+		self.setcontents(self.selected, None)
+	self.selected = newselection
+	
 while 1:
 	for e in pygame.event.get():
 		if e.type == pygame.QUIT or \
@@ -33,8 +45,8 @@ while 1:
 				b.select((float(e.pos[0]) / size[1],
 					  float(e.pos[1]) / size[1]))
 		if e.type == pygame.MOUSEBUTTONDOWN and e.button == 3:
-			b.move(((float(e.pos[0]) / size[1]) - 0.5, \
-				(float(e.pos[1]) / size[1]) - 0.5))
+			b.movemap(((float(e.pos[0]) / size[1]) - 0.5, \
+				   (float(e.pos[1]) / size[1]) - 0.5))
 
 	screen.startframe()
 	b.draw()
