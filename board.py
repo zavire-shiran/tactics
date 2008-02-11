@@ -50,7 +50,7 @@ class board:
         self.pos = [0, 0]
         self.selected = None
         self.selectedtexture = texture.Texture("Border.png")
-        self.board = array(30, 30)
+        self.board = array(15, 15)
         self.size = self.board.size
         self.enemy = texture.Texture("Enemy.png")
         grass = texture.Texture("Grass.png")
@@ -61,7 +61,7 @@ class board:
                     self.board[x, y] = tile(grass)
                 else:
                     self.board[x, y] = tile(ocean)
-        self.screensize = 10.0
+        self.screensize = 15.0
     def move (self, delta):
         self.pos[0] += delta[0]
         self.pos[0] = min(self.size[0]/self.screensize - 1, max(0, self.pos[0]))
