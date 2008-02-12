@@ -63,12 +63,13 @@ class board:
                     self.board[x, y] = tile(ocean)
                 else:
                     self.board[x, y] = tile(grass)
-        self.screensize = 15.0
+        self.screensize = 10.0
         enemytexture = texture.Texture("Enemy.png")
         herotexture = texture.Texture("Hero.png")
         self.board[0,0].contents = character(herotexture, "Hero 1")
-        self.board[5,0].contents = character(herotexture, "Hero 2")
-        self.board[9,0].contents = character(herotexture, "Hero 3")
+        self.board[3,0].contents = character(herotexture, "Hero 2")
+        self.board[6,0].contents = character(herotexture, "Hero 3")
+        self.board[9,0].contents = character(herotexture, "Hero 4")
         for x in xrange(self.size[0]):
             self.board[x, 7].contents = character(enemytexture, "Enemy %i" % (x+1))
     def movemap (self, delta):
@@ -114,13 +115,16 @@ class board:
         return (int(math.floor(self.screensize * (pos[0] + self.pos[0]))),
                 int(math.floor(self.screensize * (pos[1] + self.pos[1]))))
     def select (self, pos):
-        newselection = self.screentoworld(pos)
+        self.selected = self.screentoworld(pos)
+    def move (self, moveto):
         if self.selected and \
            self.getcontents(self.selected) and \
-           not self.getcontents(newselection):
-            self.setcontents(newselection, self.getcontents(self.selected))
+           not self.getcontents(moveto):
+            self.setcontents(moveto, self.getcontents(self.selected))
             self.setcontents(self.selected, None)
-        self.selected = newselection
+            self.selected = moveto
+            return True
+        return False
     def getcontents(self, pos):
         return self.board.reference(pos).contents
     def setcontents(self, pos, contents):
