@@ -15,14 +15,14 @@ class Texture:
         self.textnum = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.textnum)
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
+                          pygame.image.tostring(surf, "RGBA"))
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
-
-        gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
-                          pygame.image.tostring(surf, "RGBA"))
 
     def __call__(self):
         self.bind()
@@ -37,6 +37,7 @@ class Text:
         origwidth, origheight = surf.get_size()
         surf = sizeof2ify(surf)
         width, height = surf.get_size()
+        self.origbounds = origwidth, origheight
         self.bounds = (float(origwidth) / width, float(origheight) / height)
 
         glEnable(GL_TEXTURE_2D)
@@ -58,20 +59,22 @@ class Text:
     def bind (self):
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, self.textnum)
-        
-    def render(self, pos, length):
+
+    def render(self, pos, drawheight):
         self.bind()
         width, height = self.bounds
+        origwidth, origheight = self.origbounds
+        scale = drawheight / origheight
         glBegin(GL_QUADS)
         glColor4f(1.0, 1.0, 1.0, 1.0)
         glTexCoord2f(0.0, 0.0)
         glVertex2f(pos[0], pos[1])
         glTexCoord2f(0.0, height)
-        glVertex2f(pos[0], pos[1] + height*(length / width))
+        glVertex2f(pos[0], pos[1] + drawheight)
         glTexCoord2f(width, height)
-        glVertex2f(pos[0] + length, pos[1] + height*(length / width))
+        glVertex2f(pos[0] + origwidth * scale, pos[1] + drawheight)
         glTexCoord2f(width, 0.0)
-        glVertex2f(pos[0] + length, pos[1])
+        glVertex2f(pos[0] + origwidth * scale, pos[1])
         glEnd()
 
 def sizeof2ify(surf):
