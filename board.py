@@ -52,10 +52,14 @@ class tile:
         drawsquare(pos, size, self.texture)
         if self.contents:
             drawsquare(pos, size, self.contents, 1.0)
-        if showpassable and not self.passable:
-            drawsquare(pos, size, None, 2.0, (0.5, 0.5, 0.5, 0.5))
+        if showpassable:
+            if self.passable:
+                drawsquare(pos, size, None, 2.0, (0.1, 0.3, 1.0, 0.3))
+            else:
+                drawsquare(pos, size, None, 2.0, (0.0, 0.0, 0.0, 0.3))
+
     def mark(self, pos, size):
-        drawsquare(pos, size, None, 1.0, (0.0, 0.0, 1.0, 0.3))
+        drawsquare(pos, size, None, 3.0, (0.0, 0.0, 1.0, 0.3))
 
 class board:
     def __init__ (self):

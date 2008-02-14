@@ -21,6 +21,7 @@ screen.init(size, False)
 b = board.board()
 font = pygame.font.Font("Arial.ttf", 18)
 
+noneselected = texture.Text("None Selected", font)
 move = texture.Text("Moving", font)
 notmove = texture.Text("Not Moving", font)
 moving = False
@@ -71,7 +72,7 @@ while 1:
 	if sel and sel.contents:
 		t = texture.Text(str(sel.contents), font)
 	else:
-		t = texture.Text("None Selected", font)
+		t = noneselected
 	t.render((1.01, 0.0), 0.05)
 	if moving:
 		move.render((1.01, 0.07), 0.05)
