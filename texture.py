@@ -27,6 +27,9 @@ class Texture:
     def __call__(self):
         self.bind()
 
+    def __del__(self):
+        glDeleteTextures([self.textnum])
+
     def bind(self):
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, self.textnum)
@@ -52,6 +55,9 @@ class Text:
 
         gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
                           pygame.image.tostring(surf, "RGBA"))
+
+    def __del__(self):
+        glDeleteTextures([self.textnum])
 
     def __call__(self):
         self.bind()

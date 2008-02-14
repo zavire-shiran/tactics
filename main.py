@@ -25,18 +25,28 @@ move = texture.Text("Moving", font)
 notmove = texture.Text("Not Moving", font)
 moving = False
 
+def startmove():
+	global b, moving
+	if moving:
+		moving = False
+		b.clearmarks()
+	elif b.markmove():
+		moving = True
+
 while 1:
 	for e in pygame.event.get():
 		if e.type == pygame.QUIT or \
 		   e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
 			sys.exit(0)
 		elif e.type == pygame.KEYDOWN and e.key == pygame.K_m:
-			moving = not moving
+			startmove()
+		elif e.type == pygame.KEYDOWN and e.key == pygame.K_p:
+			b.toggleshowpassable()
 		elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
 			clickpos = (float(e.pos[0]) / size[1],
 				    float(e.pos[1]) / size[1])
 			if e.pos[0] > size[1] and e.pos[1] > 0.75:
-				moving = not moving
+				startmove()
 			if moving:
 				if e.pos[0] < size[1] and b.move(b.screentoworld(clickpos)):
 					moving = False
