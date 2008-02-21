@@ -36,8 +36,17 @@ class character:
         self.texture = texture
         self.name = name
         self.move = 5
+        self.str = 10
+        self.dex = 10
+        self.iq = 10
+        self.ht = 10
     def __str__ (self):
-        return self.name
+        return '\n'.join([str(i) for i in [self.name, 
+                                           "Move: %s" % self.move, 
+                                           "ST: %s" % self.str, 
+                                           "DX: %s" % self.dex, 
+                                           "IQ: %s" % self.iq, 
+                                           "HT: %s" % self.ht]])
     def __call__ (self):
         self.texture()
 
@@ -50,13 +59,13 @@ class tile:
         self.texture()
         x, y = pos
         drawsquare(pos, size, self.texture)
-        if self.contents:
-            drawsquare(pos, size, self.contents, 1.0)
         if showpassable:
             if self.passable:
-                drawsquare(pos, size, None, 2.0, (0.1, 0.3, 1.0, 0.3))
+                drawsquare(pos, size, None, 1.0, (0.1, 0.3, 1.0, 0.3))
             else:
-                drawsquare(pos, size, None, 2.0, (0.0, 0.0, 0.0, 0.3))
+                drawsquare(pos, size, None, 1.0, (1.0, 0.1, 0.3, 0.3))
+        if self.contents:
+            drawsquare(pos, size, self.contents, 2.0)
 
     def mark(self, pos, size):
         drawsquare(pos, size, None, 3.0, (0.0, 0.0, 1.0, 0.3))
@@ -99,8 +108,8 @@ class board:
         tilesize = 1.0/self.screensize
         glPushMatrix()
         glTranslatef(-self.pos[0], -self.pos[1], 0.0)
-        for x, i in zip(range(self.size[0]), [z/self.screensize for z in xrange(self.size[0])]):
-            for y, j in zip(range(self.size[1]), [z/self.screensize for z in xrange(self.size[1])]):
+        for x, i in enumerate([z/self.screensize for z in xrange(self.size[0])]):
+            for y, j in enumerate([z/self.screensize for z in xrange(self.size[1])]):
                 self.board[x, y].draw((i, j), tilesize, self.showpassable)
         glTranslate(0.0, 0.0, 0.1)
         for p in self.marklist:
@@ -110,6 +119,7 @@ class board:
             y = self.selected[1]/self.screensize
             drawsquare((x,y), tilesize, self.selectedtexture, 4.0)
         self.drawgrid()
+        glPopMatrix()
     def drawgrid(self):
         glDisable(GL_TEXTURE_2D)
         glBegin(GL_LINES)
@@ -121,7 +131,6 @@ class board:
             glVertex3f(0.0, i, 4.9)
             glVertex3f(self.size[0]/self.screensize, i, 4.5)
         glEnd()
-        glPopMatrix()
     def screentoworld(self, pos):
         return (int(math.floor(self.screensize * (pos[0] + self.pos[0]))),
                 int(math.floor(self.screensize * (pos[1] + self.pos[1]))))

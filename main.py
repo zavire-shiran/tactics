@@ -34,6 +34,14 @@ def startmove():
 	elif b.markmove():
 		moving = True
 
+pos = 0.0
+
+def sidebartext(text, textheight, linegap, font):
+	global pos
+	t = texture.Text(text, font)
+	t.render((1.01, pos), textheight)
+	pos += textheight + linegap	
+
 while 1:
 	for e in pygame.event.get():
 		if e.type == pygame.QUIT or \
@@ -69,15 +77,17 @@ while 1:
 	glPushMatrix()
 	glTranslate(0.0, 0.0, 6.0)
 	sel = b.getselected()
+	pos = 0.0
 	if sel and sel.contents:
-		t = texture.Text(str(sel.contents), font)
-	else:
-		t = noneselected
-	t.render((1.01, 0.0), 0.05)
+		for line in str(sel.contents).split('\n'):
+			if pos == 0.0:
+				sidebartext(line, 0.06, 0.01, font)
+			else:
+				sidebartext(line, 0.04, 0.01, font)
 	if moving:
-		move.render((1.01, 0.07), 0.05)
+		sidebartext("Moving", 0.05, 0.01, font)
 	else:
-		notmove.render((1.01, 0.07) , 0.05)
+		sidebartext("Not Moving", 0.05, 0.01, font)
 	glPopMatrix()
 	screen.endframe()
 	pygame.time.wait(1)
