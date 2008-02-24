@@ -7,63 +7,76 @@ import pygame
 import screen
 import board
 import texture
+import sidebar
 
 import math
 import sys
 
 pygame.init()
-frametime = .05
 
-size = 640, 480
+size = 1280, 960
 
-screen.init(size, False)
+screen.init(size, True)
+
+font = pygame.font.Font("Arial.ttf", 18)
 
 b = board.board()
-font = pygame.font.Font("Arial.ttf", 18)
+s = sidebar.sidebar(font)
 
 noneselected = texture.Text("None Selected", font)
 move = texture.Text("Moving", font)
 notmove = texture.Text("Not Moving", font)
-moving = False
 
 def startmove():
-	global b, moving
-	if moving:
-		moving = False
-		b.clearmarks()
-	elif b.markmove():
-		moving = True
+	b.startmove()
 
-pos = 0.0
+def redosidebar():
+	global b, s
+	s.clearcontents()
+	sel = b.getselected()
+	if sel and sel.contents:
+		first = True
+		for line in str(sel.contents).split('\n'):
+			if first:
+				s.addtext(line, 0.06, 0.01)
+				first = False
+			else:
+				s.addtext(line, 0.04, 0.005)
+		s.addspacer(0.05)
+		if b.moving:
+			s.addbutton("Moving", 0.05, 0.01, startmove)
+		else:
+			s.addbutton("Not Moving", 0.05, 0.01, startmove)
 
-def sidebartext(text, textheight, linegap, font):
-	global pos
-	t = texture.Text(text, font)
-	t.render((1.01, pos), textheight)
-	pos += textheight + linegap	
+def keydown(key):
+	if key == 'm':
+		b.startmove()
+		redosidebar()
+	elif key == 'p':
+		b.toggleshowpassable()
+
+def mousedown(button, (x, y)):
+	global b
+	if button == 1:
+		if x > 1.0:
+			if s.click(y):
+				redosidebar()
+		else:
+			b.select((x,y))
+			redosidebar()
+	elif button == 3:
+		b.movemap((x - 0.5, y - 0.5))
+		redosidebar()
 
 while 1:
 	for e in pygame.event.get():
 		if e.type == pygame.QUIT or \
 		   e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
 			sys.exit(0)
-		elif e.type == pygame.KEYDOWN and e.key == pygame.K_m:
-			startmove()
-		elif e.type == pygame.KEYDOWN and e.key == pygame.K_p:
-			b.toggleshowpassable()
-		elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
-			clickpos = (float(e.pos[0]) / size[1],
-				    float(e.pos[1]) / size[1])
-			if e.pos[0] > size[1] and e.pos[1] > 0.75:
-				startmove()
-			if moving:
-				if e.pos[0] < size[1] and b.move(b.screentoworld(clickpos)):
-					moving = False
-			elif e.pos[0] < size[1]:
-				b.select(clickpos)
-		elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 3:
-			b.movemap(((float(e.pos[0]) / size[1]) - 0.5, \
-				   (float(e.pos[1]) / size[1]) - 0.5))
+		if e.type == pygame.KEYDOWN:
+			keydown(pygame.key.name(e.key))
+		elif e.type == pygame.MOUSEBUTTONDOWN:
+			mousedown(e.button, (float(e.pos[0]) / size[1], float(e.pos[1]) / size[1]))
 	screen.startframe()
 	b.draw()
 	glDisable(GL_TEXTURE_2D)
@@ -76,18 +89,7 @@ while 1:
 	glEnd()
 	glPushMatrix()
 	glTranslate(0.0, 0.0, 6.0)
-	sel = b.getselected()
-	pos = 0.0
-	if sel and sel.contents:
-		for line in str(sel.contents).split('\n'):
-			if pos == 0.0:
-				sidebartext(line, 0.06, 0.01, font)
-			else:
-				sidebartext(line, 0.04, 0.01, font)
-	if moving:
-		sidebartext("Moving", 0.05, 0.01, font)
-	else:
-		sidebartext("Not Moving", 0.05, 0.01, font)
+	s.draw()
 	glPopMatrix()
 	screen.endframe()
 	pygame.time.wait(1)

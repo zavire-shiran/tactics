@@ -41,12 +41,13 @@ class character:
         self.iq = 10
         self.ht = 10
     def __str__ (self):
-        return '\n'.join([str(i) for i in [self.name, 
-                                           "Move: %s" % self.move, 
-                                           "ST: %s" % self.str, 
-                                           "DX: %s" % self.dex, 
-                                           "IQ: %s" % self.iq, 
-                                           "HT: %s" % self.ht]])
+        return '\n'.join([str(i) for i in
+                          [self.name, 
+                           "Move: %s" % self.move, 
+                           "ST: %s" % self.str, 
+                           "DX: %s" % self.dex, 
+                           "IQ: %s" % self.iq, 
+                           "HT: %s" % self.ht]])
     def __call__ (self):
         self.texture()
 
@@ -75,10 +76,11 @@ class board:
         self.pos = [0, 0]
         self.selected = None
         self.selectedtexture = texture.Texture("Border.png")
-        self.board = array(15, 15)
+        self.board = array(30, 30)
         self.size = self.board.size
         self.clearmarks()
         self.showpassable = False
+        self.moving = False
         grass = texture.Texture("Grass.png")
         ocean = texture.Texture("Ocean.png")
         for x in xrange(self.size[0]):
@@ -87,7 +89,7 @@ class board:
                     self.board[x, y] = tile(ocean)
                 else:
                     self.board[x, y] = tile(grass)
-        self.screensize = 10.0
+        self.screensize = 15.0
         enemytexture = texture.Texture("Enemy.png")
         herotexture = texture.Texture("Hero.png")
         self.board[0,0].contents = character(herotexture, "Hero 1")
@@ -135,7 +137,11 @@ class board:
         return (int(math.floor(self.screensize * (pos[0] + self.pos[0]))),
                 int(math.floor(self.screensize * (pos[1] + self.pos[1]))))
     def select (self, pos):
-        self.selected = self.screentoworld(pos)
+        if self.moving:
+            if self.move(self.screentoworld(pos)):
+                self.moving = False
+        else:
+            self.selected = self.screentoworld(pos)
     def move (self, moveto):
         if self.selected and \
            moveto in self.marklist:
@@ -146,7 +152,7 @@ class board:
             return True
         return False
     def markmove(self):
-        if not self.getselected():
+        if not (self.getselected() and self.getselected().contents):
             return False
         range = self.getselected().contents.move
         self.marklist = []
@@ -176,3 +182,9 @@ class board:
         self.marklist = []
     def toggleshowpassable(self):
         self.showpassable = not self.showpassable
+    def startmove(self):
+        if self.moving:
+            self.moving = False
+            self.clearmarks()
+        elif self.markmove():
+            self.moving = True
