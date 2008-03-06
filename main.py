@@ -4,19 +4,19 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 import pygame
+import math
+import sys
+
 import screen
 import board
 import texture
 import sidebar
 
-import math
-import sys
-
 pygame.init()
 
-size = 1280, 960
+size = 640,480
 
-screen.init(size, True)
+screen.init(size, False)
 
 font = pygame.font.Font("Arial.ttf", 18)
 
@@ -26,9 +26,6 @@ s = sidebar.sidebar(font)
 noneselected = texture.Text("None Selected", font)
 move = texture.Text("Moving", font)
 notmove = texture.Text("Not Moving", font)
-
-def startmove():
-	b.startmove()
 
 def redosidebar():
 	global b, s
@@ -44,9 +41,9 @@ def redosidebar():
 				s.addtext(line, 0.04, 0.005)
 		s.addspacer(0.05)
 		if b.moving:
-			s.addbutton("Moving", 0.05, 0.01, startmove)
+			s.addbutton("Moving", 0.05, 0.01, lambda:b.startmove())
 		else:
-			s.addbutton("Not Moving", 0.05, 0.01, startmove)
+			s.addbutton("Not Moving", 0.05, 0.01, lambda:b.startmove())
 
 def keydown(key):
 	if key == 'm':
@@ -59,8 +56,8 @@ def mousedown(button, (x, y)):
 	global b
 	if button == 1:
 		if x > 1.0:
-			if s.click(y):
-				redosidebar()
+			s.click(y)
+			redosidebar()
 		else:
 			b.select((x,y))
 			redosidebar()
@@ -79,17 +76,8 @@ while 1:
 			mousedown(e.button, (float(e.pos[0]) / size[1], float(e.pos[1]) / size[1]))
 	screen.startframe()
 	b.draw()
-	glDisable(GL_TEXTURE_2D)
-	glBegin(GL_QUADS)
-	glColor4f(0.1, 0.1, 0.3, 1.0)
-	glVertex3f(1, 0, 5.0)
-	glVertex3f(4.0/3.0, 0, 5.0)
-	glVertex3f(4.0/3.0, 1, 5.0)
-	glVertex3f(1.0, 1.0, 5.0)
-	glEnd()
-	glPushMatrix()
-	glTranslate(0.0, 0.0, 6.0)
 	s.draw()
-	glPopMatrix()
 	screen.endframe()
 	pygame.time.wait(1)
+
+#filter(lambda s: re.match('.*\.png', s), os.listdir('.'))

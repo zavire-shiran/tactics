@@ -148,14 +148,14 @@ class board:
             self.setcontents(moveto, self.getcontents(self.selected))
             self.setcontents(self.selected, None)
             self.selected = moveto
-            self.marklist = []
+            self.clearmarks()
             return True
         return False
     def markmove(self):
         if not (self.getselected() and self.getselected().contents):
             return False
         range = self.getselected().contents.move
-        self.marklist = []
+        self.clearmarks()
         queue = []
         addadjacent(self.selected, 0, queue)
         while len(queue) > 0:

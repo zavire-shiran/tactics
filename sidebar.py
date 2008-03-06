@@ -15,8 +15,7 @@ class staticstring:
         t = texture.Text(self.text, font)
         t.render((1.01, pos), self.height)
     def click(self):
-        print "clicked on", "\"" + self.text + "\""
-        return False
+        pass
 
 class spacer:
     def __init__(self, space):
@@ -26,8 +25,7 @@ class spacer:
     def draw(self, font, pos):
         pass
     def click(self):
-        print "clicked on spacer"
-        return False
+        pass
 
 class button:
     def __init__(self, text, height, linegap, action):
@@ -48,7 +46,6 @@ class button:
         t.render((1.01, pos+self.linegap/2), self.height)
     def click(self):
         self.action()
-        return True
     def size(self):
         return self.height + self.linegap
 
@@ -71,7 +68,18 @@ class sidebar:
                 return item.click()
             y += item.size()
     def draw(self):
+	glDisable(GL_TEXTURE_2D)
+	glBegin(GL_QUADS)
+	glColor4f(0.1, 0.1, 0.3, 1.0)
+	glVertex3f(1, 0, 5.0)
+	glVertex3f(4.0/3.0, 0, 5.0)
+	glVertex3f(4.0/3.0, 1, 5.0)
+	glVertex3f(1.0, 1.0, 5.0)
+	glEnd()
+	glPushMatrix()
+	glTranslate(0.0, 0.0, 6.0)
         drawpos = 0.0
         for item in self.contents:
             item.draw(self.font, drawpos)
             drawpos += item.size()
+	glPopMatrix()
