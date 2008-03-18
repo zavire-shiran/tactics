@@ -23,12 +23,7 @@ size = 640,480
 
 screen.init(size, False)
 
-font = pygame.font.Font("Arial.ttf", 18)
-
-b = board.board()
-s = sidebar.sidebar(font)
-
-register(b, s)
+b, s = register()
 
 while 1:
 	for e in pygame.event.get():
@@ -44,5 +39,3 @@ while 1:
 	s.draw()
 	screen.endframe()
 	pygame.time.wait(1)
-
-

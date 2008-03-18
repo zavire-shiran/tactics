@@ -1,10 +1,16 @@
+import pygame
+import board
+import sidebar
+
 s = None
 b = None
 
-def register(board, sidebar):
+def register():
     global b, s
-    b = board
-    s = sidebar
+    font = pygame.font.Font("Arial.ttf", 18)
+    b = board.board()
+    s = sidebar.sidebar(font)
+    return b, s
 
 def redosidebar():
     global b, s
@@ -18,11 +24,11 @@ def redosidebar():
                 first = False
             else:
                 s.addtext(line, 0.04, 0.005)
-            s.addspacer(0.05)
-            if b.moving:
-                s.addbutton("Moving", 0.05, 0.01, lambda:b.startmove())
-            else:
-                s.addbutton("Not Moving", 0.05, 0.01, lambda:b.startmove())
+        s.addspacer(0.05)
+        if b.moving:
+            s.addbutton("Moving", 0.05, 0.01, lambda:b.startmove())
+        else:
+            s.addbutton("Not Moving", 0.05, 0.01, lambda:b.startmove())
 
 def keydown(key):
     if key == 'm':

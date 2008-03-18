@@ -67,7 +67,8 @@ class tile:
                 drawsquare(pos, size, None, 1.0, (1.0, 0.1, 0.3, 0.3))
         if self.contents:
             drawsquare(pos, size, self.contents, 2.0)
-
+    def togglepassable(self):
+        self.passable = not self.passable
     def mark(self, pos, size):
         drawsquare(pos, size, None, 3.0, (0.0, 0.0, 1.0, 0.3))
 
@@ -101,6 +102,10 @@ class board:
         self.board[5,5].passable = True
         for x in xrange(self.size[0]):
             self.board[x, 7].contents = character(enemytexture, "Enemy %i" % (x+1))
+    def load(self, mapname):
+        print "load", mapname
+    def save(self, mapname):
+        print "save", mapname
     def movemap (self, delta):
         self.pos[0] += delta[0]
         self.pos[0] = min(self.size[0]/self.screensize - 1, max(0, self.pos[0]))
