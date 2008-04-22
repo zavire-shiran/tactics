@@ -5,10 +5,8 @@ import math
 
 class Texture:
     def __init__(self, f):
-        if isinstance(f, pygame.Surface):
-            surf = f
-        else:
-            surf = pygame.image.load(f)           
+        self.name = f
+        surf = pygame.image.load(f)           
         surf = sizeof2ify(surf)
         width, height = surf.get_size()
         glEnable(GL_TEXTURE_2D)

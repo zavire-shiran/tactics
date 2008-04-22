@@ -3,7 +3,8 @@ from OpenGL.GLU import *
 import math
 from array import array
 import texture
-import pprint
+#import pprint
+import shelve
 
 def addadjacent(coord, dist, queue):
     queue.insert(len(queue), (dist+1, (coord[0],   coord[1]+1)))
@@ -40,6 +41,11 @@ class character:
         self.dex = 10
         self.iq = 10
         self.ht = 10
+        self.moved = False
+        if name[0] == 'H':
+            self.side = 0
+        elif name[0] == 'E':
+            self.side = 1
     def __str__ (self):
         return '\n'.join([str(i) for i in
                           [self.name, 
@@ -47,9 +53,38 @@ class character:
                            "ST: %s" % self.str, 
                            "DX: %s" % self.dex, 
                            "IQ: %s" % self.iq, 
-                           "HT: %s" % self.ht]])
+                           "HT: %s" % self.ht,
+                           "Moved: %s" % self.moved]])
     def __call__ (self):
         self.texture()
+    def serialize(self):
+        return ['character', self.texture.name, self.name, self.move, self.str, self.dex, self.iq, self.ht]
+
+textures = {}
+
+def deserialize(obj):
+    global textures
+    if not obj:
+        return None
+    if obj[0] == 'character':
+        if obj[1] not in textures:
+            textures[obj[1]] = texture.Texture(obj[1])
+        t = textures[obj[1]]
+        c = character(t, obj[2])
+        c.move = obj[3]
+        c.str = obj[4]
+        c.dex = obj[5]
+        c.iq = obj[6]
+        c.ht = obj[7]
+        return c
+    if obj[0] == 'tile':
+        if obj[1] not in textures:
+            textures[obj[1]] = texture.Texture(obj[1])
+        t = textures[obj[1]]
+        tl = tile(t)
+        tl.contents = deserialize(obj[2])
+        tl.passable = obj[3]
+        return tl
 
 class tile:
     def __init__ (self, texture):
@@ -71,6 +106,11 @@ class tile:
         self.passable = not self.passable
     def mark(self, pos, size):
         drawsquare(pos, size, None, 3.0, (0.0, 0.0, 1.0, 0.3))
+    def serialize(self):
+        if self.contents:
+            return ['tile', self.texture.name, self.contents.serialize(), self.passable]
+        else:
+            return ['tile', self.texture.name, None, self.passable]
 
 class board:
     def __init__ (self):
@@ -90,7 +130,7 @@ class board:
                     self.board[x, y] = tile(ocean)
                 else:
                     self.board[x, y] = tile(grass)
-        self.screensize = 15.0
+        self.screensize = 10.0
         enemytexture = texture.Texture("Enemy.png")
         herotexture = texture.Texture("Hero.png")
         self.board[0,0].contents = character(herotexture, "Hero 1")
@@ -104,7 +144,17 @@ class board:
             self.board[x, 7].contents = character(enemytexture, "Enemy %i" % (x+1))
     def load(self, mapname):
         print "load", mapname
+        map = shelve.open(mapname)
+#       pprint.pprint(map['board'])
+        self.board = array(*map['boardsize'])
+        self.board.array = [deserialize(x) for x in map['board']]
     def save(self, mapname):
+        map = shelve.open(mapname)
+        map["gamename"] = "default"
+        map["boardsize"] = self.board.size
+        board = [tile.serialize() for tile in self.board.array]        
+        map["board"] = board
+        map.close()
         print "save", mapname
     def movemap (self, delta):
         self.pos[0] += delta[0]
@@ -193,3 +243,5 @@ class board:
             self.clearmarks()
         elif self.markmove():
             self.moving = True
+    def allofside(self, side):
+        return filter(lambda x: x.side == side, filter(None, [x.contents for x in self.board.array]))

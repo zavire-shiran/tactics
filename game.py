@@ -1,3 +1,4 @@
+import sys
 import pygame
 import board
 import sidebar
@@ -5,10 +6,18 @@ import sidebar
 s = None
 b = None
 
+# game state vars
+side = 0
+
+def optionp(string):
+    return string[0] != '-'
+
 def register():
-    global b, s
+    global b, s, side
     font = pygame.font.Font("Arial.ttf", 18)
+    mapname = filter(optionp, sys.argv)[1]
     b = board.board()
+    b.load(mapname)
     s = sidebar.sidebar(font)
     return b, s
 
