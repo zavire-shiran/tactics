@@ -10,7 +10,7 @@ import sys
 import screen
 import board
 import texture
-import sidebar
+import gui
 
 if '-e' in sys.argv:
 	from editor import register, mousedown, keydown
@@ -24,6 +24,8 @@ size = 640,480
 screen.init(size, False)
 
 b, s = register()
+sw = gui.statuswindow(None, 0.95, 0.79, 0.32, 0.16)
+gui.drawfont = pygame.font.Font("Arial.ttf", 18)
 
 while 1:
 	for e in pygame.event.get():
@@ -36,6 +38,6 @@ while 1:
 			mousedown(e.button, (float(e.pos[0]) / size[1], float(e.pos[1]) / size[1]))
 	screen.startframe()
 	b.draw()
-	s.draw()
+	sw.draw()
 	screen.endframe()
 	pygame.time.wait(1)

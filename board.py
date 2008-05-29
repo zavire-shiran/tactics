@@ -158,7 +158,7 @@ class board:
         print "save", mapname
     def movemap (self, delta):
         self.pos[0] += delta[0]
-        self.pos[0] = min(self.size[0]/self.screensize - 1, max(0, self.pos[0]))
+        self.pos[0] = min(self.size[0]/self.screensize - 4.0/3.0, max(0, self.pos[0]))
         self.pos[1] += delta[1]
         self.pos[1] = min(self.size[1]/self.screensize - 1, max(0, self.pos[1]))
     def draw (self):
