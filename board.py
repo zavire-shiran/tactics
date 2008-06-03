@@ -41,6 +41,8 @@ class character:
         self.dex = 10
         self.iq = 10
         self.ht = 10
+        self.hp = 10
+        self.fp = 10
         self.moved = False
         if name[0] == 'H':
             self.side = 0
@@ -231,6 +233,12 @@ class board:
     def getselected(self):
         if self.selected:
             return self.board.reference(self.selected)
+        else:
+            return None
+    def getselectedcontents(self):
+        s = self.getselected()
+        if s:
+            return s.contents
         else:
             return None
     def clearmarks(self):
