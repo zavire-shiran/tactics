@@ -1,7 +1,6 @@
 import sys
 import pygame
 import board
-import sidebar
 import gui
 
 s = None
@@ -38,6 +37,7 @@ def mousedown(button, (x, y)):
         statuswindow = None
         b.select((x,y))
         if b.getselectedcontents():
-            statuswindow = gui.newwindow(gui.statuswindowspec, b.getselectedcontents(), pos, (0.32, 0.16))
+            statuswindow = gui.newwindow(gui.statuswindowspec, b.getselectedcontents(),
+                                         pos, [lambda:b.startmove()])
     elif button == 3:
         b.movemap((x - 0.666, y - 0.5))

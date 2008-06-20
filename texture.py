@@ -60,6 +60,9 @@ class Text:
     def __call__(self):
         self.bind()
 
+    def horizsize(self, drawheight):
+        return (drawheight / self.origbounds[1]) * self.origbounds[0]
+
     def bind (self):
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, self.textnum)
@@ -80,6 +83,10 @@ class Text:
         glTexCoord2f(width, 0.0)
         glVertex2f(pos[0] + origwidth * scale, pos[1])
         glEnd()
+
+def horizsize(text, font, drawheight):
+    rsize = font.size(text)
+    return (float(drawheight) / rsize[1]) * rsize[0]
 
 def sizeof2ify(surf):
     ret = pygame.Surface([int(nextpowerof2(x)) for x in surf.get_size()], 0, surf)

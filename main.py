@@ -43,7 +43,9 @@ while 1:
 			point = (float(e.pos[0]) / size[1], float(e.pos[1]) / size[1])
 			inwindow = False
 			for win in gui.windows:
-				if win.ispointin(point):
+				if win.click(point):
+					inwindow = True
+				elif win.ispointin(point):
 					inwindow = True
 					movingwindow = win
 			if not inwindow:
