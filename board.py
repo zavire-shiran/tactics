@@ -5,6 +5,7 @@ from array import array
 import texture
 #import pprint
 import shelve
+from media import loadtexture
 
 def addadjacent(coord, dist, queue):
     queue.insert(len(queue), (dist+1, (coord[0],   coord[1]+1)))
@@ -15,7 +16,7 @@ def addadjacent(coord, dist, queue):
 def withinbounds((x,y), (xsize, ysize)):
     return 0 <= x < xsize and 0 <= y < ysize
 
-def drawsquare((x,y), size, texture, depth = 0, color = (1.0, 1.0, 1.0, 1.0)):
+def drawsquare((x,y), xsize, ysize, texture, depth = 0, color = (1.0, 1.0, 1.0, 1.0), tilt = 0.0):
     if texture:
         texture()
     else:
@@ -23,13 +24,13 @@ def drawsquare((x,y), size, texture, depth = 0, color = (1.0, 1.0, 1.0, 1.0)):
     glBegin(GL_QUADS)
     glColor(color)
     glTexCoord2f(0.0, 0.0)
-    glVertex3f(x, y, depth)
+    glVertex3f(x, y, depth + tilt)
     glTexCoord2f(0.0, 1.0)
-    glVertex3f(x, y+size, depth)
+    glVertex3f(x, y+ysize, depth)
     glTexCoord2f(1.0, 1.0)
-    glVertex3f(x+size, y+size, depth)
+    glVertex3f(x+xsize, y+ysize, depth)
     glTexCoord2f(1.0, 0.0)
-    glVertex3f(x+size, y, depth)
+    glVertex3f(x+xsize, y, depth + tilt)
     glEnd()
 
 class character:
@@ -62,16 +63,11 @@ class character:
     def serialize(self):
         return ['character', self.texture.name, self.name, self.move, self.str, self.dex, self.iq, self.ht]
 
-textures = {}
-
 def deserialize(obj):
-    global textures
     if not obj:
         return None
     if obj[0] == 'character':
-        if obj[1] not in textures:
-            textures[obj[1]] = texture.Texture(obj[1])
-        t = textures[obj[1]]
+        t = loadtexture(obj[1])
         c = character(t, obj[2])
         c.move = obj[3]
         c.str = obj[4]
@@ -80,9 +76,7 @@ def deserialize(obj):
         c.ht = obj[7]
         return c
     if obj[0] == 'tile':
-        if obj[1] not in textures:
-            textures[obj[1]] = texture.Texture(obj[1])
-        t = textures[obj[1]]
+        t = loadtexture(obj[1])
         tl = tile(t)
         tl.contents = deserialize(obj[2])
         tl.passable = obj[3]
@@ -96,18 +90,20 @@ class tile:
     def draw (self, pos, size, showpassable = False):
         self.texture()
         x, y = pos
-        drawsquare(pos, size, self.texture)
+        drawsquare(pos, size, size, self.texture)
         if showpassable:
             if self.passable:
-                drawsquare(pos, size, None, 1.0, (0.1, 0.3, 1.0, 0.3))
+                drawsquare(pos, size, size, None, 1.0, (0.1, 0.3, 1.0, 0.3))
             else:
-                drawsquare(pos, size, None, 1.0, (1.0, 0.1, 0.3, 0.3))
+                drawsquare(pos, size, size, None, 1.0, (1.0, 0.1, 0.3, 0.3))
         if self.contents:
-            drawsquare(pos, size, self.contents, 2.0)
+            pos = list(pos)
+            pos[1] -= 0.1
+            drawsquare(pos, size, size*2, self.contents, 2.0, (1.0,1.0,1.0,1.0), 0.5)
     def togglepassable(self):
         self.passable = not self.passable
     def mark(self, pos, size):
-        drawsquare(pos, size, None, 3.0, (0.0, 0.0, 1.0, 0.3))
+        drawsquare(pos, size, size, None, 3.0, (0.0, 0.0, 1.0, 0.3))
     def serialize(self):
         if self.contents:
             return ['tile', self.texture.name, self.contents.serialize(), self.passable]
@@ -118,14 +114,14 @@ class board:
     def __init__ (self):
         self.pos = [0, 0]
         self.selected = None
-        self.selectedtexture = texture.Texture("Border.png")
+        self.selectedtexture = loadtexture("Border.png")
         self.board = array(30, 30)
         self.size = self.board.size
         self.clearmarks()
         self.showpassable = False
         self.moving = False
-        grass = texture.Texture("Grass.png")
-        ocean = texture.Texture("Ocean.png")
+        grass = loadtexture("Grass.png")
+        ocean = loadtexture("Ocean.png")
         for x in xrange(self.size[0]):
             for y in xrange (self.size[1]):
                 if x % 10 == 0 or y % 10 == 0:
@@ -133,8 +129,8 @@ class board:
                 else:
                     self.board[x, y] = tile(grass)
         self.screensize = 10.0
-        enemytexture = texture.Texture("Enemy.png")
-        herotexture = texture.Texture("Hero.png")
+        enemytexture = loadtexture("Enemy.png")
+        herotexture = loadtexture("Hero.png")
         self.board[0,0].contents = character(herotexture, "Hero 1")
         self.board[3,0].contents = character(herotexture, "Hero 2")
         self.board[6,0].contents = character(herotexture, "Hero 3")
@@ -176,7 +172,7 @@ class board:
         if self.selected:
             x = self.selected[0]/self.screensize
             y = self.selected[1]/self.screensize
-            drawsquare((x,y), tilesize, self.selectedtexture, 4.0)
+            drawsquare((x,y), tilesize, tilesize, self.selectedtexture, 4.0)
         self.drawgrid()
         glPopMatrix()
     def drawgrid(self):

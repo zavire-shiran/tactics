@@ -23,7 +23,7 @@ size = 640,480
 
 screen.init(size, False)
 
-b, s = register()
+b = register()
 gui.drawfont = pygame.font.Font("Arial.ttf", 18)
 
 movingwindow = None

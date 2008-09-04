@@ -44,7 +44,7 @@ class window:
                 if s[0][0] == '@' and \
                    self.pos[0]+s[1] <= x <= self.pos[0]+s[1]+texture.horizsize(s[0][1:], drawfont, s[3]) and \
                    self.pos[1]+s[2] <= y <= self.pos[1]+s[2]+s[3]:
-                    self.actions[[s[0] for s in self.spec if s[0][0] == '@'].index(s[0])]()
+                    self.actions[[p[0] for p in self.spec if p[0][0] == '@'].index(s[0])]()
                     return True
         return False
                 

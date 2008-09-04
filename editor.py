@@ -2,12 +2,13 @@ import sys
 import os
 import re
 import pygame
+import gui
 
 import board
-import sidebar
 import texture
 
-s = None
+from media import loadtexture
+
 b = None
 terrainbrush = None
 entitybrush = None
@@ -36,35 +37,20 @@ def optionp(string):
     return string[0] != '-'
 
 def register():
-    global b, s, images, imagenames, mapname
+    global b, images, imagenames, mapname
     font = pygame.font.Font("Arial.ttf", 18)
-    mapname = filter(optionp, sys.argv)[1]
     b = board.board()
-    b.load(mapname)
-    s = sidebar.sidebar(font)
-    imagenames = filter(lambda s: re.match('.*\.png', s), os.listdir('.'))
-    images = map(texture.Texture, imagenames)
-    redosidebar()
-    return b, s
-
-def redosidebar():
-    global b, s
-    s.clearcontents()
-    sel = b.getselected()
-    if brushname:
-        s.addtext(brushname, 0.06, 0.01)
-    else:
-        s.addspacer(0.07)
-    for imagename, image in zip(imagenames, images):
-        iname = imagename
-        s.addbutton(imagename, 0.05, 0.01, functor(setterrainbrush, image, imagename))
-    s.addspacer(0.07)
-    s.addbutton("Hero", 0.05, 0.01, functor(setentitybrush, lambda: board.character(texture.Texture("Hero.png"), "Hero"), "Hero"))
-    s.addbutton("Enemy", 0.05, 0.01, 
-                functor(setentitybrush, lambda: board.character(texture.Texture("Enemy.png"), "Enemy"), "Enemy"))
-    s.addbutton("Empty", 0.05, 0.01, functor(setentitybrush, lambda: None, "Empty"))
-    s.addspacer(0.07)
-    s.addbutton("Save", 0.05, 0.01, functor(b.save, mapname))
+    mapname = filter(optionp, sys.argv)
+    if len(mapname) > 1:
+        b.load(mapname[1])
+    imagenames = filter(lambda s: re.match('.*\.png', s), os.listdir('terrain'))
+    images = map(loadtexture, imagenames)
+    terrains = os.listdir('terrain')
+    ysize = len(terrains) * 0.035 + 0.01
+    spec = [['@'+n.split('.')[0], 0.005, i*0.035+0.005, 0.035] for i, n in enumerate(terrains)]
+    funcs = [functor(setterrainbrush, loadtexture(n), n.split('.')[0]) for n in terrains]
+    window = gui.newwindow([0.25, ysize] + spec, None, (0.0, 0.0), funcs)
+    return b
 
 def keydown(key):
     global terrainbrush, entitybrush, brushname
@@ -76,21 +62,15 @@ def keydown(key):
             brushname = "Passability"
         elif brushname == "Passability":
             brushname = ""
-        redosidebar()
 
 def mousedown(button, (x, y)):
     global b
     if button == 1:
-        if x > 1.0:
-            s.click(y)
-            redosidebar()
-        else:
-            if b.showpassable and brushname == "Passability":
-                b.board.reference(b.screentoworld((x,y))).togglepassable()
-            if terrainbrush:
-                b.board.reference(b.screentoworld((x,y))).texture = terrainbrush
-            if entitybrush:
-                b.board.reference(b.screentoworld((x,y))).contents = entitybrush()
+        if b.showpassable and brushname == "Passability":
+            b.board.reference(b.screentoworld((x,y))).togglepassable()
+        if terrainbrush:
+            b.board.reference(b.screentoworld((x,y))).texture = terrainbrush
+        if entitybrush:
+            b.board.reference(b.screentoworld((x,y))).contents = entitybrush()
     elif button == 3 and x < 1.0:
         b.movemap((x - 0.5, y - 0.5))
-        redosidebar()

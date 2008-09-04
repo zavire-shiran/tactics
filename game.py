@@ -19,7 +19,7 @@ def register():
     mapname = filter(optionp, sys.argv)[1]
     b = board.board()
     b.load(mapname)
-    return b, s
+    return b
 
 def keydown(key):
     if key == 'm':
@@ -36,6 +36,7 @@ def mousedown(button, (x, y)):
             pos = statuswindow.pos
         statuswindow = None
         b.select((x,y))
+        print b.getselectedcontents()
         if b.getselectedcontents():
             statuswindow = gui.newwindow(gui.statuswindowspec, b.getselectedcontents(),
                                          pos, [lambda:b.startmove()])
