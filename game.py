@@ -3,9 +3,6 @@ import pygame
 import board
 import gui
 
-s = None
-b = None
-
 # game state vars
 side = 0
 statuswindow = None
@@ -14,31 +11,25 @@ def optionp(string):
     return string[0] != '-'
 
 def register():
-    global b, s, side
-    font = pygame.font.Font("Arial.ttf", 18)
-    mapname = filter(optionp, sys.argv)[1]
-    b = board.board()
-    b.load(mapname)
-    return b
+    pass
 
 def keydown(key):
     if key == 'm':
-        b.startmove()
+        board.startmove()
     elif key == 'p':
-        b.toggleshowpassable()
+        board.toggleshowpassable()
 
 def mousedown(button, (x, y)):
-    global b, statuswindow
+    global statuswindow
     if button == 1:
         gui.remwindow(statuswindow)
         pos = (0.95, 0.79)
         if statuswindow:
             pos = statuswindow.pos
         statuswindow = None
-        b.select((x,y))
-        print b.getselectedcontents()
-        if b.getselectedcontents():
-            statuswindow = gui.newwindow(gui.statuswindowspec, b.getselectedcontents(),
-                                         pos, [lambda:b.startmove()])
+        board.select((x,y))
+        if board.getselectedcontents():
+            statuswindow = gui.newwindow(gui.statuswindowspec, board.getselectedcontents(),
+                                         pos, [lambda:board.startmove()])
     elif button == 3:
-        b.movemap((x - 0.666, y - 0.5))
+        board.movemap((x - 0.666, y - 0.5))

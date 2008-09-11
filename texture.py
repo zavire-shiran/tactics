@@ -7,7 +7,7 @@ class Texture:
     def __init__(self, f):
         self.name = f
         surf = pygame.image.load(f)           
-        surf = sizeof2ify(surf)
+        #surf = sizeof2ify(surf)
         width, height = surf.get_size()
         glEnable(GL_TEXTURE_2D)
         self.textnum = glGenTextures(1)

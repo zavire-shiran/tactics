@@ -12,10 +12,26 @@ import board
 import texture
 import gui
 
-if '-e' in sys.argv:
-	from editor import register, mousedown, keydown
-else:
-	from game import register, mousedown, keydown
+import editor
+import game
+
+def seteditor():
+	global mousedown, keydown
+	mousedown, keydown = editor.mousedown, editor.keydown
+	board.init(loadfrom = 'map/example')
+	editor.register()
+
+def setneweditor():
+	global mousedown, keydown
+	mousedown, keydown = editor.mousedown, editor.keydown
+	board.init()
+	editor.register()
+
+def setgame():
+	global mousedown, keydown
+	mousedown, keydown = game.mousedown, game.keydown
+	board.init()
+	game.register()
 
 pygame.init()
 
@@ -23,8 +39,14 @@ size = 640,480
 
 screen.init(size, False)
 
-b = register()
 gui.drawfont = pygame.font.Font("Arial.ttf", 18)
+
+mainmenuspec = [0.32, 0.16,
+		["@Play map", 0.05, 0, 0.05],
+		["@Edit map", 0.05, 0.05, 0.05],
+		["@Edit new map", 0.05, 0.10, 0.05]]
+
+gui.newwindow(mainmenuspec, None, (0, 0), [setgame, seteditor, setneweditor])
 
 movingwindow = None
 movingscreen = False
@@ -48,17 +70,18 @@ while 1:
 				elif win.ispointin(point):
 					inwindow = True
 					movingwindow = win
-			if not inwindow:
+			if not inwindow and board.initialized:
 				mousedown(e.button, point)
 		elif e.type == pygame.MOUSEBUTTONUP:
 			movingscreen = False
 			movingwindow = None
 		elif movingwindow and e.type == pygame.MOUSEMOTION:
 			movingwindow.move((float(e.rel[0])/size[1], float(e.rel[1])/size[1]))
-		elif movingscreen and e.type == pygame.MOUSEMOTION:
-			b.movemap((-float(e.rel[0])/size[1], -float(e.rel[1])/size[1]))
+		elif board.initialized and movingscreen and e.type == pygame.MOUSEMOTION:
+			board.movemap((-float(e.rel[0])/size[1], -float(e.rel[1])/size[1]))
 	screen.startframe()
-	b.draw()
+	if board.initialized:
+		board.draw()
 	for win in gui.windows:
 		win.draw()
 	screen.endframe()

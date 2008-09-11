@@ -6,10 +6,10 @@ import gui
 
 import board
 import texture
+import chars
 
 from media import loadtexture
 
-b = None
 terrainbrush = None
 entitybrush = None
 brushname = None
@@ -37,26 +37,27 @@ def optionp(string):
     return string[0] != '-'
 
 def register():
-    global b, images, imagenames, mapname
+    global images, imagenames, mapname
     font = pygame.font.Font("Arial.ttf", 18)
-    b = board.board()
-    mapname = filter(optionp, sys.argv)
-    if len(mapname) > 1:
-        b.load(mapname[1])
-    imagenames = filter(lambda s: re.match('.*\.png', s), os.listdir('terrain'))
-    images = map(loadtexture, imagenames)
     terrains = os.listdir('terrain')
-    ysize = len(terrains) * 0.035 + 0.01
+    terrainysize = len(terrains) * 0.035
     spec = [['@'+n.split('.')[0], 0.005, i*0.035+0.005, 0.035] for i, n in enumerate(terrains)]
-    funcs = [functor(setterrainbrush, loadtexture(n), n.split('.')[0]) for n in terrains]
-    window = gui.newwindow([0.25, ysize] + spec, None, (0.0, 0.0), funcs)
-    return b
+    charspec = [['@Add Char', 0.005, terrainysize, 0.035], ['@Rem Char', 0.005, terrainysize+0.035, 0.035]]
+    funcs = [functor(setterrainbrush, loadtexture(n), n.split('.')[0]) for n in terrains] + \
+            [functor(setentitybrush, addchar, 'add char'), functor(setentitybrush, remchar, 'remchar')]
+    window = gui.newwindow([0.25, terrainysize + 0.08] + spec + charspec, None, (0.0, 0.0), funcs)
+
+def addchar():
+    return chars.character(loadtexture('Hero.png'), 'Name')
+
+def remchar():
+    return None
 
 def keydown(key):
     global terrainbrush, entitybrush, brushname
     if key == 'p':
-        b.toggleshowpassable()
-        if b.showpassable:
+        board.toggleshowpassable()
+        if board.showpassable:
             terrainbrush = None
             entitybrush = None
             brushname = "Passability"
@@ -64,13 +65,12 @@ def keydown(key):
             brushname = ""
 
 def mousedown(button, (x, y)):
-    global b
     if button == 1:
-        if b.showpassable and brushname == "Passability":
-            b.board.reference(b.screentoworld((x,y))).togglepassable()
+        if board.showpassable and brushname == "Passability":
+            board.board.reference(board.screentoworld((x,y))).togglepassable()
         if terrainbrush:
-            b.board.reference(b.screentoworld((x,y))).texture = terrainbrush
+            board.board.reference(board.screentoworld((x,y))).texture = terrainbrush
         if entitybrush:
-            b.board.reference(b.screentoworld((x,y))).contents = entitybrush()
+            board.board.reference(board.screentoworld((x,y))).contents = entitybrush()
     elif button == 3 and x < 1.0:
-        b.movemap((x - 0.5, y - 0.5))
+        board.movemap((x - 0.5, y - 0.5))
