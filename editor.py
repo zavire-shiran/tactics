@@ -36,9 +36,8 @@ def setentitybrush(entitygen, entityname):
 def optionp(string):
     return string[0] != '-'
 
-def register():
-    global images, imagenames, mapname
-    font = pygame.font.Font("Arial.ttf", 18)
+def makeeditwindow():
+    global window
     terrains = os.listdir('terrain')
     terrainysize = len(terrains) * 0.035
     spec = [['@'+n.split('.')[0], 0.005, i*0.035+0.005, 0.035] for i, n in enumerate(terrains)]
@@ -46,6 +45,12 @@ def register():
     funcs = [functor(setterrainbrush, loadtexture(n), n.split('.')[0]) for n in terrains] + \
             [functor(setentitybrush, addchar, 'add char'), functor(setentitybrush, remchar, 'remchar')]
     window = gui.newwindow([0.25, terrainysize + 0.08] + spec + charspec, None, (0.0, 0.0), funcs)
+
+def register():
+    global images, imagenames, mapname
+    gui.removeallwindows()
+    font = pygame.font.Font("Arial.ttf", 18)
+    makeeditwindow()
 
 def addchar():
     return chars.character(loadtexture('Hero.png'), 'Name')

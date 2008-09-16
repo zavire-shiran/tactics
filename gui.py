@@ -15,21 +15,9 @@ def remwindow(win):
     if windows.count(win) > 0:
         windows.remove(win)
 
-statuswindowspec = [0.32, 0.16,
-                    ['**name', 0.005, 0.0, 0.05],
-		    ['PA', 0.005, 0.05, 0.035],
-		    ['**pa', 0.055, 0.05, 0.035],
-		    ['PD', 0.005, 0.085, 0.035],
-		    ['**pd', 0.055, 0.085, 0.035],
-		    ['SP', 0.11, 0.05, 0.035],
-		    ['**sp', 0.165, 0.05, 0.035],
-		    ['SR', 0.11, 0.085, 0.035],
-		    ['**sr', 0.165, 0.085, 0.035],
-		    ['HP', 0.005, 0.12, 0.035],
-		    ['**hp', 0.055, 0.12, 0.035],
-		    ['TP', 0.11, 0.12, 0.035],
-		    ['**tp', 0.165, 0.12, 0.035],
-                    ['@Move', 0.210, 0.05, 0.035]]
+def removeallwindows():
+    global windows
+    windows = []
 
 class window:
     def __init__(self, spec, character, x, y, actions):

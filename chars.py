@@ -21,4 +21,3 @@ class character:
         self.texture()
     def serialize(self):
         return ['character', self.texture.name, self.hp, self.tp, self.pa, self.pd, self.sp, self.sr, self.speed, self.move]
-
