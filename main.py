@@ -39,7 +39,7 @@ size = 640,480
 
 screen.init(size, False)
 
-gui.drawfont = pygame.font.Font("Arial.ttf", 18)
+gui.drawfont = 'Arial.ttf'
 
 mainmenuspec = [0.32, 0.16,
                 ["@Play map", 0.05, 0, 0.05],

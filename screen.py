@@ -4,6 +4,7 @@ from OpenGL.GLU import *
 import math
 
 def init(size, fullscreen = False):
+	global width, height
         width, height = size
         flags = OPENGL | DOUBLEBUF
         if fullscreen:

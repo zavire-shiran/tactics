@@ -41,7 +41,7 @@ def makeeditwindow():
     terrains = os.listdir('terrain')
     terrainysize = len(terrains) * 0.035
     spec = [['@'+n.split('.')[0], 0.005, i*0.035+0.005, 0.035] for i, n in enumerate(terrains)]
-    charspec = [['@Add Char', 0.005, terrainysize, 0.035], ['@Rem Char', 0.005, terrainysize+0.035, 0.035]]
+    charspec = [['@Add Char', 0.005, terrainysize+0.005, 0.035], ['@Rem Char', 0.005, terrainysize+0.040, 0.035]]
     funcs = [functor(setterrainbrush, loadtexture(n), n.split('.')[0]) for n in terrains] + \
             [functor(setentitybrush, addchar, 'add char'), functor(setentitybrush, remchar, 'remchar')]
     window = gui.newwindow([0.25, terrainysize + 0.08] + spec + charspec, None, (0.0, 0.0), funcs)

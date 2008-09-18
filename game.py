@@ -6,6 +6,9 @@ import gui
 # game state vars
 side = 0
 statuswindow = None
+movewindow = None
+
+menuwindowspec = []
 
 statuswindowspec = [0.32, 0.19,
                     ['**name', 0.005, 0.0, 0.05],

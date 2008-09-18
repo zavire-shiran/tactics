@@ -2,6 +2,7 @@ import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import texture
+import screen
 
 drawfont = None
 
@@ -58,9 +59,9 @@ class window:
         glTranslate(0.0, 0.0, 6.0)
         for s in self.spec:
             if s[0][:2] == '**':
-                t = texture.Text(str(getattr(self.char, s[0][2:])), drawfont)
+                t = texture.Text(str(getattr(self.char, s[0][2:])), drawfont, s[3] * screen.height)
             elif s[0][:1] == '@':
-                t = texture.Text(s[0][1:], drawfont)
+                t = texture.Text(s[0][1:], drawfont, s[3] * screen.height)
                 hsize = t.horizsize(s[3])
                 glDisable(GL_TEXTURE_2D)
                 glBegin(GL_LINE_LOOP)
@@ -71,6 +72,6 @@ class window:
                 glVertex3f(x+s[1]-0.005, y+s[2]+s[3], 0.01)
                 glEnd()
             else:
-                t = texture.Text(s[0], drawfont)
+                t = texture.Text(s[0], drawfont, s[3] * screen.height)
             t.render((x+s[1], y+s[2]), s[3])
         glPopMatrix()
