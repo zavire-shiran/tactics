@@ -40,19 +40,12 @@ def deserialize(obj):
     if not obj:
         return None
     if obj[0] == 'character':
-        t = loadtexture(obj[1])
+        t = loadtexture(obj[1].split('/')[-1])
         c = character(t, obj[2])
-        c.hp = obj[3]
-        c.tp = obj[4]
-        c.pa = obj[5]
-        c.pd = obj[6]
-        c.sp = obj[7]
-        c.sr = obj[7]
-        c.speed = obj[8]
-        c.move = obj[9]
+        c.stats = obj[3]
         return c
     if obj[0] == 'tile':
-        t = loadtexture(obj[1])
+        t = loadtexture(obj[1].split('/')[-1])
         tl = tile(t)
         tl.contents = deserialize(obj[2])
         tl.passable = obj[3]
@@ -138,9 +131,9 @@ def save(mapname):
 def movemap (delta):
     global pos
     pos[0] += delta[0]
-    pos[0] = min(size[0]/screensize - 4.0/3.0, max(0, pos[0]))
+    pos[0] = max(0, min(size[0]/screensize - 4.0/3.0, pos[0]))
     pos[1] += delta[1]
-    pos[1] = min(size[1]/screensize - 1, max(0, pos[1]))
+    pos[1] = max(0, min(size[1]/screensize - 1, pos[1]))
 def draw ():
     tilesize = 1.0/screensize
     glPushMatrix()
@@ -192,7 +185,7 @@ def markmove():
     global marklist
     if not (getselected() and getselected().contents):
         return False
-    range = getselected().contents.move
+    range = getselected().contents.stats['move']
     clearmarks()
     queue = []
     addadjacent(selected, 0, queue)

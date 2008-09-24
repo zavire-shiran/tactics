@@ -58,7 +58,10 @@ class window:
         glPushMatrix()
         glTranslate(0.0, 0.0, 6.0)
         for s in self.spec:
-            if s[0][:2] == '**':
+            if s[0][:3] == '***':
+                bits = s[0][3:].split('.')
+                t = texture.Text(str(getattr(self.char, bits[0]).get(bits[1])), drawfont, s[3] * screen.height)
+            elif s[0][:2] == '**':
                 t = texture.Text(str(getattr(self.char, s[0][2:])), drawfont, s[3] * screen.height)
             elif s[0][:1] == '@':
                 t = texture.Text(s[0][1:], drawfont, s[3] * screen.height)

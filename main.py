@@ -15,6 +15,9 @@ import gui
 import editor
 import game
 
+keydown = None
+mousedown = None
+
 def seteditor():
         global mousedown, keydown
         mousedown, keydown = editor.mousedown, editor.keydown
@@ -56,7 +59,7 @@ while 1:
                 if e.type == pygame.QUIT or \
                    e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
                         sys.exit(0)
-                elif e.type == pygame.KEYDOWN:
+                elif e.type == pygame.KEYDOWN and keydown:
                         keydown(pygame.key.name(e.key))
                 elif e.type == pygame.MOUSEBUTTONDOWN:
                         if e.button == 3:
