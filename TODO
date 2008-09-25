@@ -1,14 +1,18 @@
 Choose new glyph for dict lookup in gui
 character editing
+refactor window creation
 
 Big Goals:
 Editor Working
-Port to Windows/Macs
 Battle System
 Multi Layers
 Animations
 Effects
 Glowy
+Port to Windows/Macs
+
+Notes:
+Fake skill point window
 
 END:
 Cinematics

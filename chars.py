@@ -1,22 +1,19 @@
-
-
+defaultstats = {'hp': 50, 'maxhp': 50, 'tp': 30, 'maxtp': 30, 'pa': 25, 'pd': 10, 'sp': 5, 'sr': 5, 
+                'speed': 100, 'move': 3, 'side': 0, 'ct': 0, 'level': 10, 'xp': 0}
+         
 class character:
     def __init__ (self, texture, name):
         self.texture = texture
         self.name = name
         self.stats = {}
-        self.stats['hp'] = 50
-        self.stats['tp'] = 30
-        self.stats['pa'] = 25
-        self.stats['pd'] = 10
-        self.stats['sp'] = 5
-        self.stats['sr'] = 5
-        self.stats['speed'] = 100
-        self.stats['move'] = 3
-        if name[0] == 'H':
-            self.stats['side'] = 0
-        elif name[0] == 'E':
-            self.stats['side'] = 1
+        self.checkstats()
+    def checkstats(self):
+        for k,v in defaultstats.iteritems():
+            if k not in self.stats:
+                self.stats[k] = v
+        for k in self.stats.keys():
+            if k not in defaultstats:
+                del self.stats[k]
     def __call__ (self):
         self.texture()
     def serialize(self):

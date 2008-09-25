@@ -41,6 +41,10 @@ def keydown(key):
         board.startmove()
     elif key == 'p':
         board.toggleshowpassable()
+    elif key == '-':
+        board.screensize +=1
+    elif key == '=':
+        board.screensize -=1
 
 def mousedown(button, (x, y)):
     global statuswindow
