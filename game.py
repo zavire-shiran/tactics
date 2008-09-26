@@ -44,7 +44,7 @@ def keydown(key):
     elif key == '-':
         board.screensize +=1
     elif key == '=':
-        board.screensize -=1
+        board.screensize = max(1, board.screensize - 1)
 
 def mousedown(button, (x, y)):
     global statuswindow
