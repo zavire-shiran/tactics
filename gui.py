@@ -29,11 +29,11 @@ class window:
         self.actions = actions
     def click(self, (x, y)):
         if self.ispointin((x, y)):
-            for s in self.spec:
-                if s[0][0] == '@' and \
-                   self.pos[0]+s[1] <= x <= self.pos[0]+s[1]+texture.horizsize(s[0][1:], drawfont, s[3]) and \
+            buttonsonly = [z for z in self.spec if z[0][0] == '@']
+            for n,s in enumerate(buttonsonly):
+                if self.pos[0]+s[1] <= x <= self.pos[0]+s[1]+texture.horizsize(s[0][1:], drawfont, s[3]) and \
                    self.pos[1]+s[2] <= y <= self.pos[1]+s[2]+s[3]:
-                    self.actions[[p[0] for p in self.spec if p[0][0] == '@'].index(s[0])]()
+                    self.actions[n]()
                     return True
         return False
                 

@@ -33,14 +33,14 @@ def setneweditor():
 def setgame():
         global mousedown, keydown
         mousedown, keydown = game.mousedown, game.keydown
-        board.init()
+        board.init(loadfrom = 'map/example')
         game.register()
 
 pygame.init()
 
 size = 640,480
 
-screen.init(size, False)
+screen.init(size, True)
 
 gui.drawfont = 'Arial.ttf'
 

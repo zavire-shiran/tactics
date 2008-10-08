@@ -45,7 +45,7 @@ def deserialize(obj):
         c.stats = obj[3]
         return c
     if obj[0] == 'tile':
-        t = loadtexture(obj[1].split('/')[-1])
+        t = loadtexture(obj[1])
         tl = tile(t)
         tl.contents = deserialize(obj[2])
         tl.passable = obj[3]
@@ -65,6 +65,7 @@ class tile:
                 drawsquare(pos, size, size, None, 1.0, (0.1, 0.3, 1.0, 0.3))
             else:
                 drawsquare(pos, size, size, None, 1.0, (1.0, 0.1, 0.3, 0.3))
+    def drawcontents(self, pos, size):
         if self.contents:
             pos = list(pos)
             pos[1] -= 1.0/screensize
@@ -72,14 +73,14 @@ class tile:
     def togglepassable(self):
         self.passable = not self.passable
     def mark(self, pos, size):
-        drawsquare(pos, size, size, None, 3.0, (0.0, 0.0, 1.0, 0.3))
+        drawsquare(pos, size, size, None, 2.0, (0.0, 0.0, 1.0, 0.3))
     def serialize(self):
         if self.contents:
             return ['tile', self.texture.name, self.contents.serialize(), self.passable]
         else:
             return ['tile', self.texture.name, None, self.passable]
 
-def init (s = (30, 30), loadfrom = None):
+def init (s = (20, 20), loadfrom = None):
     global pos, selected, selectedtexture, board, size, showpassable, moving, screensize,initialized
     initialized = True
     pos = [0, 0]
@@ -94,8 +95,8 @@ def init (s = (30, 30), loadfrom = None):
     if loadfrom:
         load(loadfrom)
         return
-    grass = loadtexture("Grass.png")
-    ocean = loadtexture("Ocean.png")
+    grass = loadtexture("grass.png")
+    ocean = loadtexture("water.png")
     for x in xrange(size[0]):
         for y in xrange (size[1]):
             if x % 10 == 0 or y % 10 == 0:
@@ -135,6 +136,7 @@ def movemap (delta):
     pos[1] += delta[1]
     pos[1] = max(0, min(size[1]/screensize - 1, pos[1]))
 def draw ():
+    global screensize
     tilesize = 1.0/screensize
     glPushMatrix()
     glTranslatef(-pos[0], -pos[1], 0.0)
@@ -144,11 +146,14 @@ def draw ():
     glTranslate(0.0, 0.0, 0.1)
     for p in marklist:
         board.reference(p).mark(tuple(i/screensize for i in p), tilesize)
+    for x, i in enumerate([z/screensize for z in xrange(size[0])]):
+        for y, j in enumerate([z/screensize for z in xrange(size[1])]):
+            board[x, y].drawcontents((i, j), tilesize)
     if selected:
         x = selected[0]/screensize
         y = selected[1]/screensize
         drawsquare((x,y), tilesize, tilesize, selectedtexture, 4.0)
-    drawgrid()
+    #drawgrid()
     glPopMatrix()
 def drawgrid():
     glDisable(GL_TEXTURE_2D)

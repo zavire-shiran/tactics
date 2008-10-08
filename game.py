@@ -42,9 +42,9 @@ def keydown(key):
     elif key == 'p':
         board.toggleshowpassable()
     elif key == '-':
-        board.screensize +=1
+        board.screensize += 1.0
     elif key == '=':
-        board.screensize = max(1, board.screensize - 1)
+        board.screensize = max(1.0, board.screensize - 1.0)
 
 def mousedown(button, (x, y)):
     global statuswindow
