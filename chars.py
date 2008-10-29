@@ -1,5 +1,5 @@
-defaultstats = {'hp': 50, 'maxhp': 50, 'tp': 30, 'maxtp': 30, 'pa': 25, 'pd': 10, 'sp': 5, 'sr': 5, 
-                'speed': 100, 'move': 3, 'side': 0, 'ct': 0, 'level': 10, 'xp': 0}
+defaultstats = {'hp': 50, 'maxhp': 50, 'tp': 30, 'maxtp': 30, 'pa': 25, 'pd': 10, 'sp': 5, 'sr': 5, 'level': 1,
+                'speed': 100, 'move': 3, 'side': 0, 'ct': 0, 'level': 10, 'xp': 0, 'ct': 0.0}
          
 class character:
     def __init__ (self, texture, name):

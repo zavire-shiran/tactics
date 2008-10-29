@@ -69,11 +69,14 @@ class tile:
         if self.contents:
             pos = list(pos)
             pos[1] -= 1.0/screensize
-            drawsquare(pos, size, size*2, self.contents, 2.0, (1.0,1.0,1.0,1.0), 0.5)
+            if self.contents.stats['ct'] == 1.0:
+                drawsquare(pos, size, size*2, self.contents, 2.0, (1.0,1.0,1.0,1.0), 0.5)
+            else:
+                drawsquare(pos, size, size*2, self.contents, 2.0, (1.0,1.0,1.0,0.5), 0.5)
     def togglepassable(self):
         self.passable = not self.passable
-    def mark(self, pos, size):
-        drawsquare(pos, size, size, None, 2.0, (0.0, 0.0, 1.0, 0.3))
+    def mark(self, pos, size, color = (0.0, 0.0, 1.0, 0.3)):
+        drawsquare(pos, size, size, None, 2.0, color)
     def serialize(self):
         if self.contents:
             return ['tile', self.texture.name, self.contents.serialize(), self.passable]
@@ -81,7 +84,7 @@ class tile:
             return ['tile', self.texture.name, None, self.passable]
 
 def init (s = (20, 20), loadfrom = None):
-    global pos, selected, selectedtexture, board, size, showpassable, moving, screensize,initialized
+    global pos, selected, selectedtexture, board, size, showpassable, moving, attacking, screensize, initialized
     initialized = True
     pos = [0, 0]
     selected = None
@@ -91,6 +94,7 @@ def init (s = (20, 20), loadfrom = None):
     clearmarks()
     showpassable = False
     moving = False
+    attacking = False
     screensize = 10.0
     if loadfrom:
         load(loadfrom)
@@ -145,7 +149,10 @@ def draw ():
             board[x, y].draw((i, j), tilesize, showpassable)
     glTranslate(0.0, 0.0, 0.1)
     for p in marklist:
-        board.reference(p).mark(tuple(i/screensize for i in p), tilesize)
+        if attacking:
+            board.reference(p).mark(tuple(i/screensize for i in p), tilesize, (1.0, 0.0, 0.0, 0.3))
+        else:
+            board.reference(p).mark(tuple(i/screensize for i in p), tilesize)
     for x, i in enumerate([z/screensize for z in xrange(size[0])]):
         for y, j in enumerate([z/screensize for z in xrange(size[1])]):
             board[x, y].drawcontents((i, j), tilesize)
@@ -171,10 +178,13 @@ def screentoworld(p):
     return (int(math.floor(screensize * (p[0] + pos[0]))),
             int(math.floor(screensize * (p[1] + pos[1]))))
 def select (p):
-    global moving, selected
+    global moving, attacking, selected
     if moving:
         if move(screentoworld(p)):
             moving = False
+    elif attacking:
+        if attack(screentoworld(p)):
+            attacking = False
     else:
         selected = screentoworld(p)
 def move (moveto):
@@ -183,6 +193,7 @@ def move (moveto):
         setcontents(moveto, getcontents(selected))
         setcontents(selected, None)
         selected = moveto
+        getcontents(selected).stats['ct'] = 0.0
         clearmarks()
         return True
     return False
@@ -200,6 +211,33 @@ def markmove():
                 and not getcontents(current_square) and current_square not in marklist:
             marklist.insert(len(queue), current_square)
             addadjacent(current_square, dist, queue)
+    if marklist == []:
+        return False
+    return True
+def attack(attackto):
+    global selected
+    if selected and attackto in marklist and getcontents(attackto) != None:
+        attacker = getcontents(selected)
+        defender = getcontents(attackto)
+        damage = math.floor(attacker.stats['pa'] + attacker.stats['level'] - defender.stats['level'] * 
+                            defender.stats['pd'] / defender.stats['pa'])
+        if damage >= defender.stats['hp']:
+            #defender is dead
+            attackto.contents = None
+        else:
+            defender.stats['hp'] = int(defender.stats['hp'] - damage)
+        clearmarks()
+        return True
+    return False
+def markattack():
+    global marklist, selected
+    if not (getselected() and getselected().contents):
+        return False
+    adjacent = []
+    addadjacent(selected, 0, adjacent)
+    adjacent = [x[1] for x in adjacent]
+    for a in adjacent:
+        marklist.insert(0, a)
     if marklist == []:
         return False
     return True
@@ -227,11 +265,37 @@ def toggleshowpassable():
     global showpassable
     showpassable = not showpassable
 def startmove():
-    global moving
+    global moving, attacking
+    attacking = False
     if moving:
         moving = False
         clearmarks()
     elif markmove():
         moving = True
+def startattack():
+    global attacking, moving
+    moving = False
+    if attacking:
+        attacking = False
+        clearmarks()
+    elif markattack():
+        attacking = True
 def allofside(side):
-    return [y for y in [x.contents for x in board.array if x.contents] if y.side == side]
+    return [y for y in allchars() if y.side == side]
+def allchars():
+    return [x.contents for x in board.array if x.contents]
+def advtime():
+    next = None
+    timetonext = 0
+    for c in allchars():
+        if next == None:
+            next = c
+            timetonext = (1.0 - c.stats['ct'])/c.stats['speed']
+        else:
+            timetoturn = (1.0 - c.stats['ct'])/c.stats['speed']
+            if timetoturn < timetonext:
+                next = c
+                timetonext = timetoturn
+    for c in allchars():
+        c.stats['ct'] += c.stats['speed'] * timetonext
+    return next

@@ -8,7 +8,28 @@ side = 0
 statuswindow = None
 movewindow = None
 
-menuwindowspec = []
+movewindowspec = [0.32, 0.19,
+                  ['**name', 0.005, 0.0, 0.05],
+                  ['PA', 0.005, 0.05, 0.035],
+                  ['***stats.pa', 0.055, 0.05, 0.035],
+                  ['PD', 0.005, 0.085, 0.035],
+                  ['***stats.pd', 0.055, 0.085, 0.035],
+                  ['SP', 0.11, 0.05, 0.035],
+                  ['***stats.sp', 0.165, 0.05, 0.035],
+                  ['SR', 0.11, 0.085, 0.035],
+                  ['***stats.sr', 0.165, 0.085, 0.035],
+                  ['HP', 0.005, 0.12, 0.035],
+                  ['***stats.hp', 0.055, 0.12, 0.035],
+                  ['TP', 0.11, 0.12, 0.035],
+                  ['***stats.tp', 0.165, 0.12, 0.035],
+                  ['CT', 0.210, 0.12, 0.035],
+                  ['***stats.ct', .265, 0.12, 0.035],
+                  ['SPD', 0.005, 0.155, 0.035],
+                  ['***stats.speed', 0.07, 0.155, 0.035],
+                  ['Move', 0.13, 0.155, 0.035],
+                  ['***stats.move', 0.210, 0.155, 0.035],
+                  ['@Move', 0.210, 0.05, 0.035],
+                  ['@Attack', 0.210, 0.084, 0.035]]
 
 statuswindowspec = [0.32, 0.19,
                     ['**name', 0.005, 0.0, 0.05],
@@ -24,11 +45,12 @@ statuswindowspec = [0.32, 0.19,
                     ['***stats.hp', 0.055, 0.12, 0.035],
                     ['TP', 0.11, 0.12, 0.035],
                     ['***stats.tp', 0.165, 0.12, 0.035],
+                    ['CT', 0.210, 0.12, 0.035],
+                    ['***stats.ct', .265, 0.12, 0.035],
                     ['SPD', 0.005, 0.155, 0.035],
                     ['***stats.speed', 0.07, 0.155, 0.035],
                     ['Move', 0.13, 0.155, 0.035],
-                    ['***stats.move', 0.210, 0.155, 0.035],
-                    ['@Move', 0.210, 0.05, 0.035]]
+                    ['***stats.move', 0.210, 0.155, 0.035]]
 
 def optionp(string):
     return string[0] != '-'
@@ -56,7 +78,11 @@ def mousedown(button, (x, y)):
         statuswindow = None
         board.select((x,y))
         if board.getselectedcontents():
-            statuswindow = gui.newwindow(statuswindowspec, board.getselectedcontents(),
-                                         pos, [lambda:board.startmove()])
+            if board.getselectedcontents().stats['ct'] >= 1.0:
+                statuswindow = gui.newwindow(movewindowspec, board.getselectedcontents(),
+                                             pos, [lambda:board.startmove(), lambda:board.startattack()])
+            else:
+                statuswindow = gui.newwindow(statuswindowspec, board.getselectedcontents(),
+                                             pos, [])
     elif button == 3:
         board.movemap((x - 0.666, y - 0.5))

@@ -40,7 +40,7 @@ pygame.init()
 
 size = 640,480
 
-screen.init(size, True)
+screen.init(size, False)
 
 gui.drawfont = 'Arial.ttf'
 
@@ -82,6 +82,8 @@ while 1:
                         movingwindow.move((float(e.rel[0])/size[1], float(e.rel[1])/size[1]))
                 elif board.initialized and movingscreen and e.type == pygame.MOUSEMOTION:
                         board.movemap((-float(e.rel[0])/size[1], -float(e.rel[1])/size[1]))
+	if board.initialized:
+		board.advtime()
         screen.startframe()
         if board.initialized:
                 board.draw()
