@@ -223,7 +223,7 @@ def attack(attackto):
                             defender.stats['pd'] / defender.stats['pa'])
         if damage >= defender.stats['hp']:
             #defender is dead
-            attackto.contents = None
+            board.reference(attackto).contents = None
         else:
             defender.stats['hp'] = int(defender.stats['hp'] - damage)
         clearmarks()
