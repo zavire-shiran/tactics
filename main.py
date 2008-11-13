@@ -54,6 +54,8 @@ gui.newwindow(mainmenuspec, None, (0, 0), [setgame, seteditor, setneweditor])
 movingwindow = None
 movingscreen = False
 
+lastframe = pygame.time.get_ticks()
+
 while 1:
         for e in pygame.event.get():
                 if e.type == pygame.QUIT or \
@@ -82,6 +84,10 @@ while 1:
                         movingwindow.move((float(e.rel[0])/size[1], float(e.rel[1])/size[1]))
                 elif board.initialized and movingscreen and e.type == pygame.MOUSEMOTION:
                         board.movemap((-float(e.rel[0])/size[1], -float(e.rel[1])/size[1]))
+	dt = (pygame.time.get_ticks() - lastframe)/1000.0
+	lastframe = pygame.time.get_ticks()
+	for a in texture.animations:
+		a.tick(dt)
 	if board.initialized:
 		board.advtime()
         screen.startframe()

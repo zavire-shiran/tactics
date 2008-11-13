@@ -40,7 +40,7 @@ def deserialize(obj):
     if not obj:
         return None
     if obj[0] == 'character':
-        t = loadtexture(obj[1].split('/')[-1])
+        t = texture.Animation('anims/HeroIdle.anim')
         c = character(t, obj[2])
         c.stats = obj[3]
         return c
@@ -118,6 +118,15 @@ def init (s = (20, 20), loadfrom = None):
     board[5,5].passable = True
     for x in xrange(size[0]):
         board[x, 7].contents = character(enemytexture, "Enemy %i" % (x+1))
+def setupdrawlists():
+    global landdrawlist, screensize
+    tilesize = 1.0/screensize
+    landdrawlist = glGenLists(1)
+    glNewList(landdrawlist, GL_COMPILE)
+    for x, i in enumerate([z/screensize for z in xrange(size[0])]):
+        for y, j in enumerate([z/screensize for z in xrange(size[1])]):
+            board[x, y].draw((i, j), tilesize, showpassable)
+    glEndList()
 def load(mapname):
     global board
     print "load", mapname
@@ -125,6 +134,7 @@ def load(mapname):
 #   pprint.pprint(map['board'])
     board = array(*map['boardsize'])
     board.array = [deserialize(x) for x in map['board']]
+    setupdrawlists()
 def save(mapname):
     map = shelve.open(mapname)
     map["gamename"] = "default"
@@ -144,9 +154,10 @@ def draw ():
     tilesize = 1.0/screensize
     glPushMatrix()
     glTranslatef(-pos[0], -pos[1], 0.0)
-    for x, i in enumerate([z/screensize for z in xrange(size[0])]):
-        for y, j in enumerate([z/screensize for z in xrange(size[1])]):
-            board[x, y].draw((i, j), tilesize, showpassable)
+    glCallList(landdrawlist)
+#    for x, i in enumerate([z/screensize for z in xrange(size[0])]):
+#        for y, j in enumerate([z/screensize for z in xrange(size[1])]):
+#            board[x, y].draw((i, j), tilesize, showpassable)
     glTranslate(0.0, 0.0, 0.1)
     for p in marklist:
         if attacking:
@@ -193,13 +204,13 @@ def move (moveto):
         setcontents(moveto, getcontents(selected))
         setcontents(selected, None)
         selected = moveto
-        getcontents(selected).stats['ct'] = 0.0
+        getcontents(selected).moved = True
         clearmarks()
         return True
     return False
 def markmove():
     global marklist
-    if not (getselected() and getselected().contents):
+    if not (getselected() and getselected().contents and not getcontents(selected).moved):
         return False
     range = getselected().contents.stats['move']
     clearmarks()
@@ -222,11 +233,11 @@ def attack(attackto):
         damage = math.floor(attacker.stats['pa'] + attacker.stats['level'] - defender.stats['level'] * 
                             defender.stats['pd'] / defender.stats['pa'])
         if damage >= defender.stats['hp']:
-            #defender is dead
             board.reference(attackto).contents = None
-        else:
+        elif damage > 0:
             defender.stats['hp'] = int(defender.stats['hp'] - damage)
         clearmarks()
+        getcontents(selected).stats['ct'] = 0.0
         return True
     return False
 def markattack():
@@ -241,6 +252,9 @@ def markattack():
     if marklist == []:
         return False
     return True
+def wait():
+    global selected
+    getcontents(selected).stats['ct'] = 0.0
 def ispassable(pos):
     return board.reference(pos).passable
 def getcontents(pos):
@@ -296,6 +310,9 @@ def advtime():
             if timetoturn < timetonext:
                 next = c
                 timetonext = timetoturn
-    for c in allchars():
-        c.stats['ct'] += c.stats['speed'] * timetonext
+    if timetonext != 0:
+        for c in allchars():
+            c.stats['ct'] += c.stats['speed'] * timetonext
+            if c.stats['ct'] == 1.0:
+                c.moved = False
     return next

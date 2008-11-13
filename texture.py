@@ -2,6 +2,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import pygame
 import math
+import media
 
 class Texture:
     def __init__(self, f):
@@ -98,3 +99,25 @@ def sizeof2ify(surf):
 def nextpowerof2(num):
     return 2 ** math.ceil(math.log(num, 2))
 
+animations = []
+
+class Animation:
+    def __init__(self, f):
+        global animations
+        f = file(f)
+        timing = [x.split() for x in f.readlines()]
+        self.timing = [(media.loadtexture(x), float(y)) for x, y in timing]
+        self.frame = 0
+        self.time = 0.0
+        animations.append(self)
+    def tick(self, dt):
+        self.time += dt
+        while self.time >= self.timing[self.frame][1]:
+            self.time -= self.timing[self.frame][1]
+            self.frame += 1
+            if self.frame >= len(self.timing):
+                self.frame = 0
+    def bind(self):
+        self.timing[self.frame][0].bind()
+    def __call__(self):
+        self.bind()

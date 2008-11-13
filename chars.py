@@ -6,6 +6,7 @@ class character:
         self.texture = texture
         self.name = name
         self.stats = {}
+        self.moved = False
         self.checkstats()
     def checkstats(self):
         for k,v in defaultstats.iteritems():
