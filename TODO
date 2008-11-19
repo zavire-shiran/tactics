@@ -1,5 +1,7 @@
-Choose new glyph for dict lookup in gui
-character editing
+character editing (need animsets)
+movement sliding
+put in attack animations
+redo status & command windows
 refactor window creation
 
 Big Goals:

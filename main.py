@@ -44,12 +44,13 @@ screen.init(size, False)
 
 gui.drawfont = 'Arial.ttf'
 
-mainmenuspec = [0.32, 0.16,
-                ["@Play map", 0.05, 0, 0.05],
-                ["@Edit map", 0.05, 0.05, 0.05],
-                ["@Edit new map", 0.05, 0.10, 0.05]]
+mainmenuspec = [0.8, 0.35,
+		["$logo.png", 0.0, 0, 0.3],
+                ["@Play map", 0.0, 0.3, 0.05],
+                ["@Edit map", 0.27, 0.3, 0.05],
+                ["@Edit new map", 0.53, 0.3, 0.05]]
 
-gui.newwindow(mainmenuspec, None, (0, 0), [setgame, seteditor, setneweditor])
+gui.newwindow(mainmenuspec, None, (.25, .325), [setgame, seteditor, setneweditor])
 
 movingwindow = None
 movingscreen = False

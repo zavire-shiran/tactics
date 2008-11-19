@@ -1,6 +1,7 @@
 import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
+import media
 import texture
 import screen
 
@@ -38,21 +39,122 @@ class window:
         return False
                 
     def ispointin(self, (x, y)):
-        return self.pos[0] <= x <= self.pos[0] + self.size[0] and \
-               self.pos[1] <= y <= self.pos[1] + self.size[1]
+        return self.pos[0] - 0.01 <= x <= self.pos[0] + self.size[0] + 0.01 and \
+               self.pos[1] - 0.01 <= y <= self.pos[1] + self.size[1] + 0.01
     def move(self, (dx, dy)):
         x, y = self.pos
         self.pos = (x + dx, y + dy)
     def draw(self):
         x, y = self.pos
         xsize, ysize = self.size
-        glDisable(GL_TEXTURE_2D)
+        bg = media.loadtexture("menu_bg.png")
+        corner = media.loadtexture("menu_corner.png")
+        vertborder = media.loadtexture("menu_side.png")
+        horzborder = media.loadtexture("menu_topbot.png")
+        buttonbg = media.loadtexture("menu_buttonbg.png")
+
+        bg()
         glBegin(GL_QUADS)
-        glColor4f(0.1, 0.1, 0.3, 1.0)
+        glColor4f(1.0, 1.0, 1.0, 1.0)
+        glTexCoord2f(0.0, 0.0)
         glVertex3f(x, y, 5.0)
+        glTexCoord2f(1.0, 0.0)
         glVertex3f(x+xsize, y, 5.0)
+        glTexCoord2f(1.0, 1.0)
         glVertex3f(x+xsize, y+ysize, 5.0)
+        glTexCoord2f(0.0, 1.0)
         glVertex3f(x, y+ysize, 5.0)
+        glEnd()
+
+        corner()
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x-0.01, y-0.01, 5.0)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x, y-0.01, 5.0)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x, y, 5.0)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x-0.01, y, 5.0)
+        glEnd()
+
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x+xsize, y-0.01, 5.0)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x+xsize+0.01, y-0.01, 5.0)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x+xsize+0.01, y, 5.0)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x+xsize, y, 5.0)
+        glEnd()
+
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x-0.01, y+ysize, 5.0)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x, y+ysize, 5.0)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x, y+ysize+0.01, 5.0)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x-0.01, y+ysize+0.01, 5.0)
+        glEnd()
+
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x+xsize, y+ysize, 5.0)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x+xsize+0.01, y+ysize, 5.0)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x+xsize+0.01, y+ysize+0.01, 5.0)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x+xsize, y+ysize+0.01, 5.0)
+        glEnd()
+
+        horzborder()
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y-0.01, 5.0)
+        glTexCoord2f(xsize/0.05 * 2, 0.0)
+        glVertex3f(x+xsize, y-0.01, 5.0)
+        glTexCoord2f(xsize/0.05 * 2, 1.0)
+        glVertex3f(x+xsize, y, 5.0)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x, y, 5.0)
+        glEnd()
+
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y+ysize, 5.0)
+        glTexCoord2f(xsize/0.05 * 2, 0.0)
+        glVertex3f(x+xsize, y+ysize, 5.0)
+        glTexCoord2f(xsize/0.05 * 2, 1.0)
+        glVertex3f(x+xsize, y+ysize+0.01, 5.0)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x, y+ysize+0.01, 5.0)
+        glEnd()
+
+        vertborder()
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x-0.01, y, 5.0)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x, y, 5.0)
+        glTexCoord2f(1.0, ysize/0.05 * 2)
+        glVertex3f(x, y+ysize, 5.0)
+        glTexCoord2f(0.0, ysize/0.05 * 2)
+        glVertex3f(x-0.01, y+ysize, 5.0)
+        glEnd()
+
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x+xsize, y, 5.0)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x+xsize+0.01, y, 5.0)
+        glTexCoord2f(1.0, ysize/0.05 * 2)
+        glVertex3f(x+xsize+0.01, y+ysize, 5.0)
+        glTexCoord2f(0.0, ysize/0.05 * 2)
+        glVertex3f(x+xsize, y+ysize, 5.0)
         glEnd()
 
         glPushMatrix()
@@ -66,15 +168,34 @@ class window:
             elif s[0][:1] == '@':
                 t = texture.Text(s[0][1:], drawfont, s[3] * screen.height)
                 hsize = t.horizsize(s[3])
-                glDisable(GL_TEXTURE_2D)
-                glBegin(GL_LINE_LOOP)
-                glColor4f(1.0, 1.0, 1.0, 1.0)
-                glVertex3f(x+s[1]-0.005, y+s[2], 0.01)
-                glVertex3f(x+s[1]+hsize+0.005, y+s[2], 0.01)
-                glVertex3f(x+s[1]+hsize+0.005, y+s[2]+s[3], 0.01)
-                glVertex3f(x+s[1]-0.005, y+s[2]+s[3], 0.01)
+                buttonbg()
+                glBegin(GL_QUADS)
+                glTexCoord2f(0.0, 0.0)
+                glVertex3f(x+s[1]-0.005, y+s[2], -0.01)
+                glTexCoord2f(1.0, 0.0)
+                glVertex3f(x+s[1]+hsize+0.005, y+s[2], -0.01)
+                glTexCoord2f(1.0, 1.0)
+                glVertex3f(x+s[1]+hsize+0.005, y+s[2]+s[3], -0.01)
+                glTexCoord2f(0.0, 1.0)
+                glVertex3f(x+s[1]-0.005, y+s[2]+s[3], -0.01)
+                glEnd()
+            elif s[0][:1] == '$':
+                t = None
+                image = media.loadtexture(s[0][1:])
+                image()
+                width = s[3] * image.size[0]/image.size[1]
+                glBegin(GL_QUADS)
+                glTexCoord2f(0.0, 0.0)
+                glVertex2f(x+s[1], y+s[2])
+                glTexCoord2f(1.0, 0.0)
+                glVertex2f(x+s[1]+width, y+s[2])
+                glTexCoord2f(1.0, 1.0)
+                glVertex2f(x+s[1]+width, y+s[2]+s[3])
+                glTexCoord2f(0.0, 1.0)
+                glVertex2f(x+s[1], y+s[2]+s[3])
                 glEnd()
             else:
                 t = texture.Text(s[0], drawfont, s[3] * screen.height)
-            t.render((x+s[1], y+s[2]), s[3])
+            if t:
+                t.render((x+s[1], y+s[2]), s[3])
         glPopMatrix()
