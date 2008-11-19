@@ -56,19 +56,17 @@ def optionp(string):
 def makeeditwindow():
     global window
     gui.removeallwindows()
-    terrains = [(i[1], i[1][8:]) for i in media.dircontents('terrain')]
+    terrains = [] #[(i[1], i[1][8:]) for i in media.dircontents('terrain')]
     terrainysize = len(terrains) * 0.035
     namespec = ['**brushname', 0.005, 0.005, 0.035]
     spec = [['@'+n[1].split('.')[0], 0.05, i*0.035+0.055, 0.035] for i, n in enumerate(terrains)]
     charspec = [['@Add Char', 0.05, terrainysize+0.065, 0.035],
-                ['@Add Enemy', 0.05, terrainysize+0.100, 0.035],
-                ['@Rem Char', 0.05, terrainysize+0.135, 0.035],
-                ['@Edit Char', 0.05, terrainysize+0.170, 0.035],
-                ['@Save map', 0.05, terrainysize+0.215, 0.035]]
+                ['@Rem Char', 0.05, terrainysize+0.100, 0.035],
+                ['@Edit Char', 0.05, terrainysize+0.135, 0.035],
+                ['@Save map', 0.05, terrainysize+0.170, 0.035]]
     funcs = [functor(setterrainbrush, loadtexture(n[0]), n[1].split('.')[0]) for n in terrains] + \
-            [functor(setentitybrush, addchar, 'Add Char'), functor(setentitybrush, addenemy, 'Add Enemy'),
-             functor(setentitybrush, remchar, 'Rem Char'), seteditchar, savemap]
-    window = gui.newwindow([0.25, terrainysize + 0.255, namespec] + spec + charspec, es, (0.0, 0.0), funcs)
+            [functor(setentitybrush, addchar, 'Add Char'), functor(setentitybrush, remchar, 'Rem Char'), seteditchar, savemap]
+    window = gui.newwindow([0.25, terrainysize + 0.210, namespec] + spec + charspec, es, (0.1, 0.1), funcs)
 
 def incstat(character, s):
     character.stats[s] += 1
@@ -89,20 +87,35 @@ def makecharwindow(character):
         funcs.append(functor(decstat, character, k))
         funcs.append(functor(incstat, character, k))
         height += 0.035
+    spec.append(["@Change Animset", 0.005, height, 0.035])
+    funcs.append(functor(makeanimsetwindow, character))
+    height += 0.035
     spec.append(["@Done", 0.005, height, 0.035])
     funcs.append(makeeditwindow)
     gui.removeallwindows()
-    window = gui.newwindow([0.35, len(character.stats.keys()) * 0.035 + 0.050] + spec, character, (0.0, 0.0), funcs)
+    window = gui.newwindow([0.35, len(character.stats.keys()) * 0.035 + 0.070] + spec, character, (0.1, 0.1), funcs)
+
+def makeanimsetwindow(character):
+    global window
+    height = 0.005
+    spec = []
+    funcs = []
+    listing = [x for x in os.listdir('animsets/') if x[-8:] == '.animset']
+    for a in listing:
+        spec.append(['@'+a, 0.005, height, 0.035])
+        funcs.append(functor(chars.character.setanimset, character, a))
+        height += 0.035
+    spec.append(["@Done", 0.005, height, 0.035])
+    funcs.append(functor(makecharwindow, character))
+    gui.removeallwindows()
+    window = gui.newwindow([0.35, len(listing) * 0.035 + 0.040] + spec, character, (0.1, 0.1), funcs)
 
 def register():
     global images, imagenames, mapname
     makeeditwindow()
 
 def addchar():
-    return chars.character(loadtexture('Hero.png'), 'Name')
-
-def addenemy():
-    return chars.character(loadtexture('Enemy.png'), 'Name')
+    return chars.character('Warpmastertemp.animset', 'Name')
 
 def remchar():
     return None

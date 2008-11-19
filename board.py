@@ -40,8 +40,7 @@ def deserialize(obj):
     if not obj:
         return None
     if obj[0] == 'character':
-        t = texture.Animation('anims/HeroIdle.anim')
-        c = character(t, obj[2])
+        c = character(obj[1], obj[2])
         c.stats = obj[3]
         return c
     if obj[0] == 'tile':
@@ -103,21 +102,8 @@ def init (s = (20, 20), loadfrom = None):
     ocean = loadtexture("water.png")
     for x in xrange(size[0]):
         for y in xrange (size[1]):
-            if x % 10 == 0 or y % 10 == 0:
-                board[x, y] = tile(ocean)
-            else:
-                board[x, y] = tile(grass)
-    enemytexture = loadtexture("Enemy.png")
-    herotexture = loadtexture("Hero.png")
-    board[0,0].contents = character(herotexture, "Hero 1")
-    board[3,0].contents = character(herotexture, "Hero 2")
-    board[6,0].contents = character(herotexture, "Hero 3")
-    board[9,0].contents = character(herotexture, "Hero 4")
-    for x in xrange(size[0]):
-        board[x,5].passable = False
-    board[5,5].passable = True
-    for x in xrange(size[0]):
-        board[x, 7].contents = character(enemytexture, "Enemy %i" % (x+1))
+            board[x, y] = tile(grass)
+    setupdrawlists()
 def setupdrawlists():
     global landdrawlist, screensize
     tilesize = 1.0/screensize
@@ -253,7 +239,9 @@ def markattack():
         return False
     return True
 def wait():
-    global selected
+    global selected, moving, attacking
+    moving, attacking = False, False
+    clearmarks()
     getcontents(selected).stats['ct'] = 0.0
 def ispassable(pos):
     return board.reference(pos).passable
